@@ -136,7 +136,7 @@ class CartScreen extends StatelessWidget {
                                     ),
                                     const SizedBox(height: 4),
                                     Text(
-                                      '\$${item.price.toStringAsFixed(2)} x ${cartItem.quantity}',
+                                      '₹${item.price.toStringAsFixed(0)} x ${cartItem.quantity}',
                                       style: GoogleFonts.jetBrainsMono(
                                         fontSize: 11,
                                         color: AppTheme.textSecondary,

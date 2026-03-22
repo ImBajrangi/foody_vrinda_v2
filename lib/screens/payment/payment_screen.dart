@@ -123,7 +123,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
           ),
           const SizedBox(height: 8),
           Text(
-            '\$${widget.amount.toStringAsFixed(2)}',
+            '₹${widget.amount.toStringAsFixed(0)}',
             style: GoogleFonts.spaceGrotesk(
               fontSize: 36,
               fontWeight: FontWeight.w800,
