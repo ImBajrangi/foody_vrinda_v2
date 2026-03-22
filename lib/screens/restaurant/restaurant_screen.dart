@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:provider/provider.dart';
@@ -80,6 +81,7 @@ class _RestaurantScreenState extends State<RestaurantScreen> {
       'image': item['image'],
       'shopId': item['shopId'] ?? 'demo_shop',
     });
+    HapticFeedback.lightImpact();
     cart.addToCart(menuItem, quantity: quantity);
     setState(() => _showPulse = true);
     Future.delayed(const Duration(seconds: 2), () {
@@ -213,7 +215,10 @@ class _RestaurantScreenState extends State<RestaurantScreen> {
   }
 
   Widget _fab(IconData icon, VoidCallback onTap) => GestureDetector(
-    onTap: onTap,
+    onTap: () {
+      HapticFeedback.lightImpact();
+      onTap();
+    },
     child: Container(
       width: 40,
       height: 40,
@@ -315,7 +320,10 @@ class _RestaurantScreenState extends State<RestaurantScreen> {
           if (_tabs[i] == 'Sweets') lottieUrl = LottieAssets.potato;
 
           return GestureDetector(
-            onTap: () => setState(() => _selectedTab = i),
+            onTap: () {
+              HapticFeedback.selectionClick();
+              setState(() => _selectedTab = i);
+            },
             child: Container(
               alignment: Alignment.center,
               padding: const EdgeInsets.symmetric(horizontal: 12),
@@ -515,6 +523,7 @@ class _RestaurantScreenState extends State<RestaurantScreen> {
         animate: _showPulse,
         child: GestureDetector(
           onTap: () {
+            HapticFeedback.mediumImpact();
             Navigator.push(
               context,
               MaterialPageRoute(builder: (_) => const CartScreen()),

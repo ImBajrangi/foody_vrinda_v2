@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:lottie/lottie.dart';
 import '../config/lottie_assets.dart';
 import '../config/app_theme.dart';
@@ -253,7 +254,12 @@ class _BouncyAddButtonState extends State<BouncyAddButton>
     return ScaleTransition(
       scale: _bounceAnimation,
       child: GestureDetector(
-        onTap: widget.onPressed,
+        onTap: () {
+          if (!widget.isAdded) {
+            HapticFeedback.mediumImpact();
+            widget.onPressed?.call();
+          }
+        },
         child: Container(
           padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
           decoration: BoxDecoration(

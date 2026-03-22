@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:provider/provider.dart';
@@ -249,7 +250,10 @@ class _FoodDetailScreenState extends State<FoodDetailScreen> {
                           max: 4,
                           divisions: 3,
                           value: _spiceLevel,
-                          onChanged: (v) => setState(() => _spiceLevel = v),
+                          onChanged: (v) {
+                            if (v != _spiceLevel) HapticFeedback.selectionClick();
+                            setState(() => _spiceLevel = v);
+                          },
                         ),
                       ),
                       Row(
@@ -322,7 +326,10 @@ class _FoodDetailScreenState extends State<FoodDetailScreen> {
   Widget _radioOption(int i) {
     final active = _baseSelection == i;
     return GestureDetector(
-      onTap: () => setState(() => _baseSelection = i),
+      onTap: () {
+        HapticFeedback.selectionClick();
+        setState(() => _baseSelection = i);
+      },
       child: Container(
         margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 4),
         padding: const EdgeInsets.all(12),
@@ -374,7 +381,10 @@ class _FoodDetailScreenState extends State<FoodDetailScreen> {
   Widget _checkboxOption(int i) {
     final checked = _addOns[i];
     return GestureDetector(
-      onTap: () => setState(() => _addOns[i] = !_addOns[i]),
+      onTap: () {
+        HapticFeedback.selectionClick();
+        setState(() => _addOns[i] = !_addOns[i]);
+      },
       child: Container(
         margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 4),
         padding: const EdgeInsets.all(12),
@@ -453,7 +463,10 @@ class _FoodDetailScreenState extends State<FoodDetailScreen> {
                         icon: const Icon(Icons.remove, size: 18),
                         color: Colors.white,
                         onPressed: () {
-                          if (_quantity > 1) setState(() => _quantity--);
+                          if (_quantity > 1) {
+                            HapticFeedback.lightImpact();
+                            setState(() => _quantity--);
+                          }
                         },
                       ),
                       Container(
@@ -475,7 +488,10 @@ class _FoodDetailScreenState extends State<FoodDetailScreen> {
                       IconButton(
                         icon: const Icon(Icons.add, size: 18),
                         color: Colors.white,
-                        onPressed: () => setState(() => _quantity++),
+                        onPressed: () {
+                          HapticFeedback.lightImpact();
+                          setState(() => _quantity++);
+                        },
                       ),
                     ],
                   ),

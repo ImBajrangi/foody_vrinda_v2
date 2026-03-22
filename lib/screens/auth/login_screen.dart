@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import 'package:cached_network_image/cached_network_image.dart';
@@ -203,7 +204,10 @@ class _LoginScreenState extends State<LoginScreen> {
         ),
         const SizedBox(height: 20),
         GestureDetector(
-          onTap: auth.isLoading ? null : () => auth.signInWithGoogle(),
+          onTap: auth.isLoading ? null : () {
+            HapticFeedback.mediumImpact();
+            auth.signInWithGoogle();
+          },
           child: Container(
             padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
@@ -230,7 +234,10 @@ class _LoginScreenState extends State<LoginScreen> {
         ),
         const SizedBox(height: 16),
         TextButton(
-          onPressed: () => auth.signInAnonymously(),
+          onPressed: () {
+            HapticFeedback.lightImpact();
+            auth.signInAnonymously();
+          },
           child: const MonoLabel('BYPASS_CORE // GUEST_ACCESS'),
         ),
       ],

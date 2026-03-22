@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:provider/provider.dart';
@@ -232,7 +233,10 @@ class _CartScreenState extends State<CartScreen> {
               ),
               const SizedBox(width: 12),
               GestureDetector(
-                onTap: _pickLocation,
+                onTap: () {
+                  HapticFeedback.mediumImpact();
+                  _pickLocation();
+                },
                 child: Container(
                   width: 50,
                   height: 50,
@@ -337,7 +341,10 @@ class _CartScreenState extends State<CartScreen> {
 
   Widget _qtyBtn(IconData icon, VoidCallback onTap) {
     return GestureDetector(
-      onTap: onTap,
+      onTap: () {
+        HapticFeedback.lightImpact();
+        onTap();
+      },
       child: Container(
         padding: const EdgeInsets.all(6),
         decoration: BoxDecoration(

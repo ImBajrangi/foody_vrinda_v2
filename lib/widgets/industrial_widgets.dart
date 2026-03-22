@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../config/app_theme.dart';
 
@@ -82,7 +83,12 @@ class _PrimaryButtonState extends State<PrimaryButton> {
       onTapDown: (_) => widget.isLoading ? null : setState(() => _isPressed = true),
       onTapUp: (_) => setState(() => _isPressed = false),
       onTapCancel: () => setState(() => _isPressed = false),
-      onTap: widget.isLoading ? null : widget.onPressed,
+      onTap: () {
+        if (!widget.isLoading) {
+          HapticFeedback.lightImpact();
+          widget.onPressed();
+        }
+      },
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 50),
         margin: _isPressed && !widget.isLoading
@@ -147,7 +153,10 @@ class CategoryChip extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTap: onTap,
+      onTap: () {
+        HapticFeedback.selectionClick();
+        onTap();
+      },
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
         decoration: BoxDecoration(
@@ -317,6 +326,7 @@ class _SlideToPayButtonState extends State<SlideToPayButton> {
                         _dragValue = maxSlide;
                         _isComplete = true;
                       });
+                      HapticFeedback.heavyImpact();
                       widget.onSlideComplete();
                     } else {
                       setState(() {
