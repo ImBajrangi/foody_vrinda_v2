@@ -5,6 +5,7 @@ import 'package:provider/provider.dart';
 import 'firebase_options.dart';
 import 'config/app_theme.dart';
 import 'providers/cart_provider.dart';
+import 'providers/favorites_provider.dart';
 import 'services/order_service.dart';
 import 'services/auth_service.dart';
 import 'services/shop_service.dart';
@@ -33,6 +34,7 @@ void main() async {
       providers: [
         ChangeNotifierProvider(create: (_) => AuthProvider()),
         ChangeNotifierProvider(create: (_) => CartProvider()),
+        ChangeNotifierProvider(create: (_) => FavoritesProvider()),
         Provider(create: (_) => OrderService()),
         Provider(create: (_) => AuthService()),
         Provider(create: (_) => ShopService()),

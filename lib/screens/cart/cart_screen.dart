@@ -70,7 +70,7 @@ class _CartScreenState extends State<CartScreen> {
           key: _formKey,
           child: Column(
             children: [
-              _buildHeader(context),
+              _buildHeader(context, cart),
               if (items.isEmpty)
                 Expanded(
                   child: EmptyState(
@@ -103,7 +103,7 @@ class _CartScreenState extends State<CartScreen> {
     );
   }
 
-  Widget _buildHeader(BuildContext context) {
+  Widget _buildHeader(BuildContext context, CartProvider cart) {
     return Padding(
       padding: const EdgeInsets.all(20),
       child: Row(
@@ -118,6 +118,50 @@ class _CartScreenState extends State<CartScreen> {
               letterSpacing: -1,
             ),
           ),
+          if (cart.items.isNotEmpty)
+            GestureDetector(
+              onTap: () {
+                HapticFeedback.heavyImpact();
+                showDialog(
+                  context: context,
+                  builder: (context) => AlertDialog(
+                    backgroundColor: AppTheme.background,
+                    shape: RoundedRectangleBorder(
+                      side: const BorderSide(color: AppTheme.borderDark),
+                      borderRadius: BorderRadius.circular(2),
+                    ),
+                    title: const MonoLabel('CLEAR_ENTIRE_CART?', fontSize: 16),
+                    content: const MonoLabel(
+                      'This will remove all items and reset shop context.',
+                      fontSize: 12,
+                      color: AppTheme.textSecondary,
+                    ),
+                    actions: [
+                      TextButton(
+                        onPressed: () => Navigator.pop(context),
+                        child: const MonoLabel('CANCEL', fontSize: 12),
+                      ),
+                      TextButton(
+                        onPressed: () {
+                          cart.clear();
+                          Navigator.pop(context);
+                        },
+                        child: const MonoLabel('CLEAR', fontSize: 12, color: Colors.red),
+                      ),
+                    ],
+                  ),
+                );
+              },
+              child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                decoration: BoxDecoration(
+                  border: Border.all(color: Colors.red.withValues(alpha: 0.5)),
+                ),
+                child: const MonoLabel('CLEAR_ALL', fontSize: 10, color: Colors.red),
+              ),
+            ),
+          if (Navigator.canPop(context))
+            const SizedBox(width: 12),
           if (Navigator.canPop(context))
             GestureDetector(
               onTap: () => Navigator.pop(context),
@@ -199,6 +243,14 @@ class _CartScreenState extends State<CartScreen> {
                       ),
                       const SizedBox(width: 12),
                       _qtyBtn(Icons.add, () => cart.addToCart(item)),
+                      const SizedBox(width: 16),
+                      GestureDetector(
+                        onTap: () {
+                          HapticFeedback.mediumImpact();
+                          cart.removeFromCart(item.id);
+                        },
+                        child: const Icon(Icons.delete_outline, color: Colors.red, size: 20),
+                      ),
                     ],
                   ),
                 ],

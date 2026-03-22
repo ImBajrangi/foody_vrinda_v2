@@ -8,6 +8,7 @@ import '../../widgets/industrial_widgets.dart';
 import '../food_detail/food_detail_screen.dart';
 import '../cart/cart_screen.dart';
 import '../../providers/cart_provider.dart';
+import '../../providers/favorites_provider.dart';
 import '../../models/menu_item_model.dart';
 import '../../config/lottie_assets.dart';
 import '../../widgets/animations.dart';
