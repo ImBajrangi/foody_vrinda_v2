@@ -358,7 +358,9 @@ class _TrackingScreenState extends State<TrackingScreen> with SingleTickerProvid
                   width: 8,
                   height: 8,
                   decoration: BoxDecoration(
-                    color: done ? AppTheme.success : (active ? AppTheme.primary : AppTheme.borderDark),
+                    color: (done || (active && currentStatus == OrderStatus.completed)) 
+                        ? AppTheme.success 
+                        : (active ? AppTheme.primary : AppTheme.borderDark),
                     shape: BoxShape.circle,
                   ),
                 ),
