@@ -35,6 +35,18 @@ class _AdminPanelState extends State<AdminPanel> with SingleTickerProviderStateM
 
   @override
   Widget build(BuildContext context) {
+    final authProvider = context.watch<AuthProvider>();
+    
+    // STRICT SECURITY: Double-check admin status inside the panel
+    if (!(authProvider.userData?.isAdmin ?? false)) {
+      return const Scaffold(
+        backgroundColor: AppTheme.background,
+        body: Center(
+          child: MonoLabel('ACCESS_DENIED // INSUFFICIENT_PERMISSIONS'),
+        ),
+      );
+    }
+
     return Scaffold(
       backgroundColor: AppTheme.background,
       appBar: AppBar(
