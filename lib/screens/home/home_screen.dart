@@ -171,7 +171,6 @@ class _HomeContentState extends State<_HomeContent> {
   @override
   Widget build(BuildContext context) {
     return Column(
-      key: UniqueKey(),
       children: [
         _buildHeader(),
         Expanded(

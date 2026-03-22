@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import '../../config/app_theme.dart';
+import '../../providers/cart_provider.dart';
 import '../../models/order_model.dart';
 import '../../services/order_service.dart';
 import '../../providers/auth_provider.dart';
@@ -197,7 +199,29 @@ class _OrderLogTile extends StatelessWidget {
                 ),
               if (order.status != OrderStatus.completed && order.status != OrderStatus.cancelled)
                 GestureDetector(
-...
+                  onTap: () => Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => TrackingScreen(orderId: order.id),
+                    ),
+                  ),
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(2),
+                    ),
+                    child: Text(
+                      'TRACK_ACTIVE',
+                      style: GoogleFonts.spaceGrotesk(
+                        fontWeight: FontWeight.w900,
+                        fontSize: 11,
+                        color: Colors.black,
+                        letterSpacing: 1,
+                      ),
+                    ),
+                  ),
+                ),
             ],
           ),
         ],
