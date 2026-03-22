@@ -6,13 +6,25 @@ import '../models/menu_item_model.dart';
 
 class CartProvider with ChangeNotifier {
   List<CartItemModel> _items = [];
+  String? _shopId;
   bool _isInitialized = false;
 
   List<CartItemModel> get items => _items;
+  String? get shopId => _shopId;
+  bool get isEmpty => _items.isEmpty;
   bool get isInitialized => _isInitialized;
 
   CartProvider() {
     _loadCart();
+  }
+
+  void setShopId(String? id) {
+    if (_shopId != id) {
+      _items.clear();
+      _shopId = id;
+      _saveCart();
+      notifyListeners();
+    }
   }
 
   // Persistent Cache Logic
@@ -20,6 +32,7 @@ class CartProvider with ChangeNotifier {
     try {
       final prefs = await SharedPreferences.getInstance();
       final cartJson = prefs.getString('cached_cart');
+      _shopId = prefs.getString('cached_shop_id');
       if (cartJson != null) {
         final List<dynamic> decoded = jsonDecode(cartJson);
         final loadedItems = decoded.map((item) {
@@ -56,6 +69,11 @@ class CartProvider with ChangeNotifier {
         'quantity': item.quantity,
       }).toList());
       await prefs.setString('cached_cart', cartJson);
+      if (_shopId != null) {
+        await prefs.setString('cached_shop_id', _shopId!);
+      } else {
+        await prefs.remove('cached_shop_id');
+      }
     } catch (e) {
       debugPrint('CartProvider: Error saving cart: $e');
     }

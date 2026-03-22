@@ -19,12 +19,11 @@ class _TrackingScreenState extends State<TrackingScreen> with SingleTickerProvid
   late AnimationController _controller;
   late Animation<double> _animation;
 
-  // Define the route points as normalized coordinates (0.0 to 1.0)
   final List<Offset> _routePoints = [
-    const Offset(0.3, 0.75), // Start
+    const Offset(0.3, 0.75), 
     const Offset(0.4, 0.55),
     const Offset(0.6, 0.5),
-    const Offset(0.55, 0.25), // End
+    const Offset(0.55, 0.25), 
   ];
 
   @override
@@ -93,7 +92,6 @@ class _TrackingScreenState extends State<TrackingScreen> with SingleTickerProvid
         final order = snapshot.data;
         final targetProgress = _getTargetProgress(order?.status);
         
-        // Smoothly animate to the new target progress
         _controller.animateTo(
           targetProgress,
           duration: const Duration(seconds: 3),
@@ -110,7 +108,6 @@ class _TrackingScreenState extends State<TrackingScreen> with SingleTickerProvid
       backgroundColor: AppTheme.background,
       body: Column(
         children: [
-          // Map Area (60%)
           Expanded(
             flex: 6,
             child: AnimatedBuilder(
@@ -121,7 +118,6 @@ class _TrackingScreenState extends State<TrackingScreen> with SingleTickerProvid
                 
                 return Stack(
                   children: [
-                    // Grid pattern background
                     Container(
                       color: const Color(0xFF111111),
                       child: CustomPaint(
@@ -129,7 +125,6 @@ class _TrackingScreenState extends State<TrackingScreen> with SingleTickerProvid
                         painter: _GridPainter(),
                       ),
                     ),
-                    // Route line
                     CustomPaint(
                       size: Size.infinite, 
                       painter: _RoutePainter(
@@ -137,13 +132,11 @@ class _TrackingScreenState extends State<TrackingScreen> with SingleTickerProvid
                         progress: currentProgress,
                       )
                     ),
-                    // Destination marker
                     Positioned(
                       top: MediaQuery.of(context).size.height * 0.6 * destPos.dy,
                       left: MediaQuery.of(context).size.width * destPos.dx,
                       child: _pulseDot(),
                     ),
-                    // Rider marker
                     Positioned(
                       top: MediaQuery.of(context).size.height * 0.6 * riderPos.dy,
                       left: MediaQuery.of(context).size.width * riderPos.dx,
@@ -175,7 +168,6 @@ class _TrackingScreenState extends State<TrackingScreen> with SingleTickerProvid
                         ),
                       ),
                     ),
-                    // Alert
                     Positioned(
                       top: MediaQuery.of(context).padding.top + 60,
                       left: 16,
@@ -191,7 +183,7 @@ class _TrackingScreenState extends State<TrackingScreen> with SingleTickerProvid
                         child: Row(
                           children: [
                             const Icon(
-                              Icons.warning_amber,
+                              Icons.bolt,
                               color: AppTheme.primary,
                               size: 22,
                             ),
@@ -200,17 +192,13 @@ class _TrackingScreenState extends State<TrackingScreen> with SingleTickerProvid
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  const MonoLabel('Live Status'),
+                                  const MonoLabel('LIVE ENGINE STATUS'),
                                   const SizedBox(height: 2),
                                   Text(
-                                    _animation.value < 0.3 
-                                      ? 'Rider just picked up order' 
-                                      : _animation.value > 0.8 
-                                        ? 'Rider is arriving soon!' 
-                                        : 'Rider stopped at light (2m)',
+                                    order?.statusMessage.toUpperCase() ?? 'INITIALIZING...',
                                     style: GoogleFonts.spaceGrotesk(
                                       fontSize: 14,
-                                      fontWeight: FontWeight.w700,
+                                      fontWeight: FontWeight.w900,
                                       color: Colors.white,
                                     ),
                                   ),
@@ -221,7 +209,6 @@ class _TrackingScreenState extends State<TrackingScreen> with SingleTickerProvid
                         ),
                       ),
                     ),
-                    // Back button
                     Positioned(
                       top: MediaQuery.of(context).padding.top + 8,
                       left: 16,
@@ -236,45 +223,7 @@ class _TrackingScreenState extends State<TrackingScreen> with SingleTickerProvid
                             border: Border.all(color: AppTheme.borderDark),
                             boxShadow: const [AppTheme.hardShadow],
                           ),
-                          child: const Icon(
-                            Icons.arrow_back,
-                            color: Colors.white,
-                            size: 20,
-                          ),
-                        ),
-                      ),
-                    ),
-                    // Help button
-                    Positioned(
-                      top: MediaQuery.of(context).padding.top + 8,
-                      right: 16,
-                      child: Container(
-                        height: 40,
-                        padding: const EdgeInsets.symmetric(horizontal: 12),
-                        decoration: BoxDecoration(
-                          color: AppTheme.surface,
-                          borderRadius: BorderRadius.circular(4),
-                          border: Border.all(color: AppTheme.borderDark),
-                          boxShadow: const [AppTheme.hardShadow],
-                        ),
-                        child: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Icon(
-                              Icons.support_agent,
-                              color: AppTheme.success,
-                              size: 16,
-                            ),
-                            const SizedBox(width: 6),
-                            Text(
-                              'HELP',
-                              style: GoogleFonts.spaceGrotesk(
-                                fontSize: 12,
-                                fontWeight: FontWeight.w700,
-                                color: Colors.white,
-                              ),
-                            ),
-                          ],
+                          child: const Icon(Icons.arrow_back, color: Colors.white, size: 20),
                         ),
                       ),
                     ),
@@ -283,33 +232,20 @@ class _TrackingScreenState extends State<TrackingScreen> with SingleTickerProvid
               },
             ),
           ),
-          // Status Card (40%)
           Expanded(
             flex: 4,
             child: Container(
-              decoration: BoxDecoration(
+              decoration: const BoxDecoration(
                 color: AppTheme.surface,
-                border: const Border(
-                  top: BorderSide(color: AppTheme.borderDark),
-                ),
-                boxShadow: [
-                  BoxShadow(
-                    offset: const Offset(0, -4),
-                    blurRadius: 20,
-                    color: Colors.black.withValues(alpha: 0.5),
-                  ),
-                ],
+                border: Border(top: BorderSide(color: AppTheme.borderDark)),
               ),
               child: Column(
                 children: [
-                  // ETA Header
                   Container(
                     padding: const EdgeInsets.all(20),
                     decoration: const BoxDecoration(
                       color: Color(0xFF18181A),
-                      border: Border(
-                        bottom: BorderSide(color: AppTheme.borderDark),
-                      ),
+                      border: Border(bottom: BorderSide(color: AppTheme.borderDark)),
                     ),
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -317,43 +253,35 @@ class _TrackingScreenState extends State<TrackingScreen> with SingleTickerProvid
                         Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            MonoLabel(order?.status == OrderStatus.completed ? 'Arrived at' : 'Estimated Arrival'),
+                            MonoLabel(order?.status == OrderStatus.completed ? 'ARRIVED_AT' : 'ESTIMATED_ARRIVAL'),
                             const SizedBox(height: 4),
                             Text(
-                              order?.status == OrderStatus.completed ? 'JUST NOW' : '12:42 PM',
+                              order?.status == OrderStatus.completed ? 'JUST NOW' : (order?.etaTime ?? '...'),
                               style: GoogleFonts.spaceGrotesk(
                                 fontSize: 24,
-                                fontWeight: FontWeight.w700,
+                                fontWeight: FontWeight.w900,
                                 color: Colors.white,
                               ),
                             ),
                           ],
                         ),
                         Container(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 8,
-                            vertical: 4,
-                          ),
+                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                           decoration: BoxDecoration(
                             color: (order?.status == OrderStatus.completed ? AppTheme.success : AppTheme.primary).withValues(alpha: 0.1),
-                            borderRadius: BorderRadius.circular(2),
-                            border: Border.all(
-                              color: (order?.status == OrderStatus.completed ? AppTheme.success : AppTheme.primary).withValues(alpha: 0.3),
-                            ),
+                            border: Border.all(color: order?.status == OrderStatus.completed ? AppTheme.success : AppTheme.primary),
                           ),
                           child: Text(
-                            (order?.status.name ?? 'ON TIME').toUpperCase().replaceAll('_', ' '),
-                            style: GoogleFonts.jetBrainsMono(
-                              fontSize: 10,
-                              fontWeight: FontWeight.w700,
+                            (order?.status.displayName ?? 'PENDING').toUpperCase(),
+                            style: AppTheme.monoSmall.copyWith(
                               color: order?.status == OrderStatus.completed ? AppTheme.success : AppTheme.primary,
+                              fontWeight: FontWeight.bold,
                             ),
                           ),
                         ),
                       ],
                     ),
                   ),
-                  // Timeline + Rider
                   Expanded(
                     child: ListView(
                       padding: const EdgeInsets.all(20),
@@ -386,9 +314,7 @@ class _TrackingScreenState extends State<TrackingScreen> with SingleTickerProvid
             decoration: BoxDecoration(
               shape: BoxShape.circle,
               color: AppTheme.primary.withValues(alpha: 0.2 * (1.0 - value)),
-              border: Border.all(
-                color: AppTheme.primary.withValues(alpha: 0.5 * (1.0 - value)),
-              ),
+              border: Border.all(color: AppTheme.primary.withValues(alpha: 0.5 * (1.0 - value))),
             ),
           );
         },
@@ -399,13 +325,7 @@ class _TrackingScreenState extends State<TrackingScreen> with SingleTickerProvid
         decoration: const BoxDecoration(
           shape: BoxShape.circle,
           color: AppTheme.primary,
-          boxShadow: [
-            BoxShadow(
-              color: AppTheme.primary,
-              blurRadius: 10,
-              spreadRadius: 2,
-            ),
-          ],
+          boxShadow: [BoxShadow(color: AppTheme.primary, blurRadius: 10, spreadRadius: 2)],
         ),
       ),
     ],
@@ -415,14 +335,10 @@ class _TrackingScreenState extends State<TrackingScreen> with SingleTickerProvid
     final statusIndex = currentStatus != null ? OrderStatus.values.indexOf(currentStatus) : 0;
     
     final steps = [
-      {'label': 'Order Confirmed', 'time': '12:15 PM', 'idx': 0},
-      {'label': 'Kitchen Preparing', 'time': '12:28 PM', 'idx': 1},
-      {
-        'label': 'Rider Picked Up',
-        'time': '12:35 PM • Heading to you',
-        'idx': 3, // outForDelivery
-      },
-      {'label': 'Arriving', 'time': '~ 7 mins', 'idx': 4}, // delivered
+      {'label': 'ORDER_CONFIRMED', 'idx': 0},
+      {'label': 'KITCHEN_PREPARING', 'idx': 1},
+      {'label': 'RIDER_PICKED_UP', 'idx': 3},
+      {'label': 'DELIVERED', 'idx': 4},
     ];
     return Container(
       padding: const EdgeInsets.only(left: 16),
@@ -436,59 +352,24 @@ class _TrackingScreenState extends State<TrackingScreen> with SingleTickerProvid
           final active = statusIndex == stepIdx;
           return Padding(
             padding: const EdgeInsets.only(bottom: 20, left: 20),
-            child: Stack(
+            child: Row(
               children: [
-                Positioned(
-                  left: -32,
-                  top: 4,
-                  child: Container(
-                    width: 10,
-                    height: 10,
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      color: done
-                          ? const Color(0xFF555555)
-                          : active
-                          ? AppTheme.primary
-                          : Colors.transparent,
-                      border: Border.all(
-                        color: done
-                            ? const Color(0xFF555555)
-                            : active
-                            ? AppTheme.primary
-                            : const Color(0xFF555555),
-                      ),
-                    ),
+                Container(
+                  width: 8,
+                  height: 8,
+                  decoration: BoxDecoration(
+                    color: done ? AppTheme.success : (active ? AppTheme.primary : AppTheme.borderDark),
+                    shape: BoxShape.circle,
                   ),
                 ),
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      step['label'].toString(),
-                      style: GoogleFonts.spaceGrotesk(
-                        fontSize: 13,
-                        fontWeight: FontWeight.w700,
-                        color: done
-                            ? const Color(0xFF555555)
-                            : active
-                            ? Colors.white
-                            : Colors.grey[400],
-                        decoration: done ? TextDecoration.lineThrough : null,
-                        decorationColor: const Color(0xFF555555),
-                      ),
-                    ),
-                    const SizedBox(height: 2),
-                    Text(
-                      step['time'].toString(),
-                      style: GoogleFonts.jetBrainsMono(
-                        fontSize: 11,
-                        color: active
-                            ? AppTheme.primary
-                            : const Color(0xFF555555),
-                      ),
-                    ),
-                  ],
+                const SizedBox(width: 16),
+                Text(
+                  step['label'].toString(),
+                  style: GoogleFonts.spaceGrotesk(
+                    fontSize: 12,
+                    fontWeight: active ? FontWeight.w900 : FontWeight.w500,
+                    color: active ? Colors.white : AppTheme.textSecondary,
+                  ),
                 ),
               ],
             ),
@@ -500,87 +381,38 @@ class _TrackingScreenState extends State<TrackingScreen> with SingleTickerProvid
 
   Widget _buildRiderCard() {
     return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        Row(
-          children: [
-            Container(
-              width: 48,
-              height: 48,
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(4),
-                border: Border.all(color: AppTheme.borderDark),
-              ),
-              clipBehavior: Clip.antiAlias,
-              child: CachedNetworkImage(
-                imageUrl:
-                    'https://lh3.googleusercontent.com/aida-public/AB6AXuBtxzTSpwD7ymXH8Sx6_YMluG00XCFwa_TizFynnoQYp2XKskf3PCRiGFBVSa8mA4w6SjuMnjTIyxRzJGjpFBfZvNYBiIiUSj_4HfedahlL3GsEJbpsskef0S_4acm4lFsQTOqmxegWmOyrwaQBsorhnCYGVOhykCKSSuIuPdoKXxHhL84uIh1H-_B53O0lThH4RUOc1Ekinyfy8s0DJFEdJuzRNrfOS0RocBCrkJqPVR6msBlIPZ9L3TgUy9SfAKXvVmUFEiCcrrXN',
-                fit: BoxFit.cover,
-              ),
-            ),
-            const SizedBox(width: 12),
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  'RAHUL S.',
-                  style: GoogleFonts.spaceGrotesk(
-                    fontSize: 14,
-                    fontWeight: FontWeight.w700,
-                    color: Colors.white,
-                  ),
-                ),
-                const SizedBox(height: 4),
-                Row(
-                  children: [
-                    Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 4,
-                        vertical: 2,
-                      ),
-                      decoration: BoxDecoration(
-                        color: const Color(0xFF0D0D0D),
-                        borderRadius: BorderRadius.circular(2),
-                        border: Border.all(color: AppTheme.borderDark),
-                      ),
-                      child: const MonoLabel('EV ECO-SCOOTER'),
-                    ),
-                    const SizedBox(width: 8),
-                    Text(
-                      '★ 4.9',
-                      style: GoogleFonts.jetBrainsMono(
-                        fontSize: 10,
-                        color: AppTheme.textSecondary,
-                      ),
-                    ),
-                  ],
-                ),
-              ],
-            ),
-          ],
-        ),
         Container(
-          height: 40,
-          padding: const EdgeInsets.symmetric(horizontal: 16),
+          width: 48,
+          height: 48,
           decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(4),
-            border: Border.all(color: AppTheme.primary.withValues(alpha: 0.5)),
+            border: Border.all(color: AppTheme.borderDark),
           ),
-          child: Row(
-            mainAxisSize: MainAxisSize.min,
+          clipBehavior: Clip.antiAlias,
+          child: CachedNetworkImage(
+            imageUrl: 'https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?auto=format&fit=crop&w=100&q=80',
+            fit: BoxFit.cover,
+          ),
+        ),
+        const SizedBox(width: 12),
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Icon(Icons.call, color: AppTheme.primary, size: 18),
-              const SizedBox(width: 6),
               Text(
-                'CALL',
-                style: GoogleFonts.spaceGrotesk(
-                  fontSize: 12,
-                  fontWeight: FontWeight.w700,
-                  color: AppTheme.primary,
-                ),
+                'RAHUL S.',
+                style: GoogleFonts.spaceGrotesk(fontSize: 14, fontWeight: FontWeight.bold, color: Colors.white),
               ),
+              const MonoLabel('EV EXEC-01 // RATING 4.9'),
             ],
           ),
+        ),
+        Container(
+          padding: const EdgeInsets.all(12),
+          decoration: BoxDecoration(
+            border: Border.all(color: AppTheme.primary),
+          ),
+          child: const Icon(Icons.phone, color: AppTheme.primary, size: 16),
         ),
       ],
     );
@@ -590,9 +422,7 @@ class _TrackingScreenState extends State<TrackingScreen> with SingleTickerProvid
 class _GridPainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
-    final paint = Paint()
-      ..color = const Color(0xFF1A1A1A)
-      ..strokeWidth = 1;
+    final paint = Paint()..color = const Color(0xFF1A1A1A)..strokeWidth = 1;
     for (double x = 0; x < size.width; x += 40) {
       canvas.drawLine(Offset(x, 0), Offset(x, size.height), paint);
     }
@@ -600,7 +430,6 @@ class _GridPainter extends CustomPainter {
       canvas.drawLine(Offset(0, y), Offset(size.width, y), paint);
     }
   }
-
   @override
   bool shouldRepaint(covariant CustomPainter old) => false;
 }
@@ -608,74 +437,34 @@ class _GridPainter extends CustomPainter {
 class _RoutePainter extends CustomPainter {
   final List<Offset> points;
   final double progress;
-
   _RoutePainter({required this.points, required this.progress});
-
   @override
   void paint(Canvas canvas, Size size) {
     if (points.isEmpty) return;
-
-    // 1. Draw Remaining (Gray/Dashed)
-    final remainingPaint = Paint()
-      ..color = AppTheme.borderDark
-      ..strokeWidth = 3
-      ..style = PaintingStyle.stroke
-      ..strokeCap = StrokeCap.round;
-
-    final fullPath = Path();
-    fullPath.moveTo(size.width * points.first.dx, size.height * points.first.dy);
+    final remainingPaint = Paint()..color = AppTheme.borderDark..strokeWidth = 2..style = PaintingStyle.stroke;
+    final traversedPaint = Paint()..color = AppTheme.primary..strokeWidth = 3..style = PaintingStyle.stroke;
+    final path = Path();
+    path.moveTo(size.width * points.first.dx, size.height * points.first.dy);
     for (var i = 1; i < points.length; i++) {
-      fullPath.lineTo(size.width * points[i].dx, size.height * points[i].dy);
+        path.lineTo(size.width * points[i].dx, size.height * points[i].dy);
     }
-
-    // Draw full path dashed
-    const dashLength = 10.0;
-    const gapLength = 6.0;
-    final metrics = fullPath.computeMetrics();
+    canvas.drawPath(path, remainingPaint);
+    final metrics = path.computeMetrics();
     for (final m in metrics) {
-      double d = 0;
-      while (d < m.length) {
-        final end = (d + dashLength).clamp(0.0, m.length);
-        canvas.drawPath(m.extractPath(d, end), remainingPaint);
-        d += dashLength + gapLength;
-      }
-    }
-
-    // 2. Draw Traversed (Success Color/Solid)
-    final traversedPaint = Paint()
-      ..color = AppTheme.success
-      ..strokeWidth = 4
-      ..style = PaintingStyle.stroke
-      ..strokeCap = StrokeCap.round;
-
-    for (final m in metrics) {
-      final totalLen = m.length;
-      final currentLen = totalLen * progress;
-      if (currentLen > 0) {
-        canvas.drawPath(m.extractPath(0, currentLen), traversedPaint);
-      }
+        canvas.drawPath(m.extractPath(0, m.length * progress), traversedPaint);
     }
   }
-
   @override
-  bool shouldRepaint(covariant _RoutePainter oldDelegate) => 
-      oldDelegate.points != points || oldDelegate.progress != progress;
+  bool shouldRepaint(covariant _RoutePainter oldDelegate) => true;
 }
 
 class _ArrowPainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
-    final paint = Paint()
-      ..color = Colors.white
-      ..style = PaintingStyle.fill;
-    final path = Path()
-      ..moveTo(size.width / 2, 0)
-      ..lineTo(0, size.height)
-      ..lineTo(size.width, size.height)
-      ..close();
+    final paint = Paint()..color = AppTheme.primary..style = PaintingStyle.fill;
+    final path = Path()..moveTo(size.width / 2, 0)..lineTo(0, size.height)..lineTo(size.width, size.height)..close();
     canvas.drawPath(path, paint);
   }
-
   @override
   bool shouldRepaint(covariant CustomPainter old) => false;
 }

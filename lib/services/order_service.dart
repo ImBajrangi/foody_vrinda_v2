@@ -270,13 +270,23 @@ class OrderService {
   }
 
   // Update order status
-  Future<void> updateOrderStatus(String orderId, OrderStatus status) async {
+  Future<void> updateOrderStatus(String orderId, OrderStatus status, {String? reason}) async {
     try {
       debugPrint('OrderService: Updating order $orderId to status ${status.value}');
-      await _firestore.collection('orders').doc(orderId).update({
+      final Map<String, dynamic> updateData = {
         'status': status.value,
         'updatedAt': FieldValue.serverTimestamp(),
-      });
+      };
+      
+      if (reason != null) {
+        if (status == OrderStatus.cancelled) {
+          updateData['cancelReason'] = reason;
+        } else if (status == OrderStatus.returned) {
+          updateData['returnReason'] = reason;
+        }
+      }
+
+      await _firestore.collection('orders').doc(orderId).update(updateData);
       debugPrint('OrderService: Order status updated successfully');
     } catch (e) {
       debugPrint('OrderService: Error updating order status: $e');

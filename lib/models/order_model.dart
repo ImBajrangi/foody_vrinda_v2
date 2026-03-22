@@ -153,7 +153,13 @@ class OrderModel {
   final DateTime? cashSettledAt;
   final DateTime? returnedAt;
   final String? returnReason;
+  final String? cancelReason;
   final List<DateTime> contactAttempts;
+  final bool isUnreachable;
+  final double? customerLatitude;
+  final double? customerLongitude;
+  final DateTime? createdAt;
+  final DateTime? updatedAt;
   final bool isUnreachable;
   final double? customerLatitude;
   final double? customerLongitude;
@@ -183,6 +189,7 @@ class OrderModel {
     this.cashSettledAt,
     this.returnedAt,
     this.returnReason,
+    this.cancelReason,
     this.contactAttempts = const [],
     this.isUnreachable = false,
     this.customerLatitude,
@@ -241,6 +248,7 @@ class OrderModel {
           ? (data['returnedAt'] as Timestamp).toDate()
           : null,
       returnReason: data['returnReason'],
+      cancelReason: data['cancelReason'],
       contactAttempts:
           (data['contactAttempts'] as List<dynamic>?)
               ?.map((t) => (t as Timestamp).toDate())
@@ -285,6 +293,7 @@ class OrderModel {
           : null,
       'returnedAt': returnedAt != null ? Timestamp.fromDate(returnedAt!) : null,
       'returnReason': returnReason,
+      'cancelReason': cancelReason,
       'contactAttempts': contactAttempts
           .map((t) => Timestamp.fromDate(t))
           .toList(),
@@ -351,6 +360,7 @@ class OrderModel {
       cashSettledAt: cashSettledAt ?? this.cashSettledAt,
       returnedAt: returnedAt ?? this.returnedAt,
       returnReason: returnReason ?? this.returnReason,
+      cancelReason: cancelReason ?? this.cancelReason,
       contactAttempts: contactAttempts ?? this.contactAttempts,
       isUnreachable: isUnreachable ?? this.isUnreachable,
       customerLatitude: customerLatitude ?? this.customerLatitude,
@@ -395,6 +405,12 @@ class OrderModel {
   String get arrivalTime {
     if (createdAt == null) return 'N/A';
     return DateFormat('hh:mm a').format(createdAt!);
+  }
+
+  String get etaTime {
+    if (createdAt == null) return 'N/A';
+    final eta = createdAt!.add(const Duration(minutes: 30));
+    return DateFormat('hh:mm a').format(eta);
   }
 
   String get formattedDate {

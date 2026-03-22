@@ -6,6 +6,7 @@ import '../../widgets/industrial_widgets.dart';
 import '../../providers/auth_provider.dart';
 import '../order/order_history_screen.dart';
 import '../dashboard/dashboard_screen.dart';
+import 'admin_panel.dart';
 
 class ProfileScreen extends StatelessWidget {
   const ProfileScreen({super.key});
@@ -68,11 +69,20 @@ class ProfileScreen extends StatelessWidget {
                 const SizedBox(height: 24),
                 _profileOption(Icons.terminal, 'MY_ACCOUNT', () {}),
                 if (authProvider.userData?.isStaff ?? false)
-                  _profileOption(Icons.dashboard, 'ADMIN_CONSOLE', () {
+                  _profileOption(Icons.dashboard, 'STAFF_CONSOLE', () {
                     Navigator.push(
                       context,
                       MaterialPageRoute(
                         builder: (context) => const DashboardScreen(),
+                      ),
+                    );
+                  }),
+                if (authProvider.userData?.isAdmin ?? false)
+                  _profileOption(Icons.admin_panel_settings, 'ADMIN_CONSOLE', () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const AdminPanel(),
                       ),
                     );
                   }),

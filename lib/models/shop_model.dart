@@ -295,6 +295,7 @@ class ShopModel {
   final double gstPercentage; // GST percentage
   final String? discountTag; // e.g., "50% OFF"
   final String? discountDescription; // e.g., "Up to ₹100 on first order"
+  final bool isOnline; // Whether the shop is currently accepting orders
 
   ShopModel({
     required this.id,
@@ -318,6 +319,7 @@ class ShopModel {
     this.gstPercentage = 5.0,
     this.discountTag,
     this.discountDescription,
+    this.isOnline = true,
   }) : schedule = schedule ?? ShopSchedule(),
        alarmSettings = alarmSettings ?? AlarmSettings();
 
@@ -404,6 +406,7 @@ class ShopModel {
       gstPercentage: (data['gstPercentage'] ?? 5.0).toDouble(),
       discountTag: data['discountTag']?.toString(),
       discountDescription: data['discountDescription']?.toString(),
+      isOnline: data['isOnline'] ?? true,
     );
   }
 
@@ -431,6 +434,7 @@ class ShopModel {
       'gstPercentage': gstPercentage,
       'discountTag': discountTag,
       'discountDescription': discountDescription,
+      'isOnline': isOnline,
     };
   }
 
@@ -456,6 +460,7 @@ class ShopModel {
     double? gstPercentage,
     String? discountTag,
     String? discountDescription,
+    bool? isOnline,
   }) {
     return ShopModel(
       id: id ?? this.id,
@@ -479,6 +484,7 @@ class ShopModel {
       gstPercentage: gstPercentage ?? this.gstPercentage,
       discountTag: discountTag ?? this.discountTag,
       discountDescription: discountDescription ?? this.discountDescription,
+      isOnline: isOnline ?? this.isOnline,
     );
   }
 

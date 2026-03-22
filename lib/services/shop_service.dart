@@ -108,6 +108,16 @@ class ShopService {
     _shopCache[shop.id] = shop; // Update cache immediately
   }
 
+  /// Update shop online status
+  Future<void> updateShopStatus(String shopId, bool isOnline) async {
+    await _firestore.collection('shops').doc(shopId).update({
+      'isOnline': isOnline,
+    });
+    if (_shopCache.containsKey(shopId)) {
+      _shopCache[shopId] = _shopCache[shopId]!.copyWith(isOnline: isOnline);
+    }
+  }
+
   /// Delete shop
   Future<void> deleteShop(String shopId) async {
     await _firestore.collection('shops').doc(shopId).delete();
