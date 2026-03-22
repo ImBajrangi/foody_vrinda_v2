@@ -38,14 +38,12 @@ class _AnimatedLoaderState extends State<AnimatedLoader> {
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           if (_showAnimation)
-            SizedBox(
-              width: widget.size,
-              height: widget.size,
-              child: RepaintBoundary(
-                child: LottieAssets.build(
-                  LottieAssets.foodLoading,
-                  fit: BoxFit.contain,
-                ),
+            const SizedBox(
+              width: 40,
+              height: 40,
+              child: CircularProgressIndicator(
+                color: AppTheme.primary,
+                strokeWidth: 2,
               ),
             ),
           if (widget.message != null && _showAnimation) ...[
@@ -90,14 +88,18 @@ class EmptyState extends StatelessWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            SizedBox(
-              width: 200,
-              height: 200,
-              child: RepaintBoundary(
-                child: LottieAssets.build(
-                  animationUrl,
-                  fit: BoxFit.contain,
-                ),
+            Container(
+              width: 120,
+              height: 120,
+              decoration: BoxDecoration(
+                color: AppTheme.surface,
+                border: Border.all(color: AppTheme.borderDark, width: 2),
+                boxShadow: const [AppTheme.hardShadow],
+              ),
+              child: const Icon(
+                Icons.restaurant_menu,
+                size: 60,
+                color: AppTheme.primary,
               ),
             ),
             const SizedBox(height: 24),
@@ -170,16 +172,15 @@ class _SuccessAnimationOverlayState extends State<SuccessAnimationOverlay> {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            SizedBox(
-              width: 250,
-              height: 250,
-              child: RepaintBoundary(
-                child: LottieAssets.build(
-                  LottieAssets.orderSuccess,
-                  repeat: false,
-                  fit: BoxFit.contain,
-                ),
+            Container(
+              width: 150,
+              height: 150,
+              decoration: const BoxDecoration(
+                color: AppTheme.success,
+                shape: BoxShape.circle,
+                boxShadow: [AppTheme.hardShadow],
               ),
+              child: const Icon(Icons.check_rounded, color: Colors.white, size: 80),
             ),
             if (widget.message != null) ...[
               const SizedBox(height: 24),
