@@ -140,6 +140,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
       final orderId = await orderService.createOrder(
         userId: userId,
         shopId: cart.shopId ?? 'main_kitchen',
+        shopName: cart.restaurantName,
         customerName: widget.customerName,
         customerPhone: widget.customerPhone,
         deliveryAddress: widget.deliveryAddress,

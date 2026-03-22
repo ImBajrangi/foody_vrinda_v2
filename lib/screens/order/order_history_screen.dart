@@ -164,22 +164,28 @@ class _OrderLogTile extends StatelessWidget {
                   ),
                 ],
               ),
-              if (order.status != OrderStatus.completed && order.status != OrderStatus.cancelled)
+              if (order.status == OrderStatus.completed || order.status == OrderStatus.cancelled)
                 GestureDetector(
-                  onTap: () => Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => TrackingScreen(orderId: order.id),
-                    ),
-                  ),
+                  onTap: () {
+                    HapticFeedback.mediumImpact();
+                    final cart = context.read<CartProvider>();
+                    cart.loadFromOrder(order, order.shopName ?? 'RESTORED_SHOP');
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                        content: MonoLabel('ITEMS_RESTORED_TO_CART', color: Colors.black),
+                        backgroundColor: AppTheme.primary,
+                        duration: Duration(seconds: 2),
+                      ),
+                    );
+                  },
                   child: Container(
                     padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                     decoration: BoxDecoration(
-                      color: Colors.white,
+                      color: AppTheme.primary,
                       borderRadius: BorderRadius.circular(2),
                     ),
                     child: Text(
-                      'TRACK_ACTIVE',
+                      'RE-ORDER',
                       style: GoogleFonts.spaceGrotesk(
                         fontWeight: FontWeight.w900,
                         fontSize: 11,
@@ -189,6 +195,9 @@ class _OrderLogTile extends StatelessWidget {
                     ),
                   ),
                 ),
+              if (order.status != OrderStatus.completed && order.status != OrderStatus.cancelled)
+                GestureDetector(
+...
             ],
           ),
         ],

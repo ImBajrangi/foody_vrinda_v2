@@ -133,6 +133,7 @@ class OrderItem {
 class OrderModel {
   final String id;
   final String shopId;
+  final String? shopName;
   final String? userId;
   final String customerName;
   final String customerPhone;
@@ -164,6 +165,7 @@ class OrderModel {
   OrderModel({
     required this.id,
     required this.shopId,
+    this.shopName,
     this.userId,
     required this.customerName,
     required this.customerPhone,
@@ -217,6 +219,7 @@ class OrderModel {
     return OrderModel(
       id: doc.id,
       shopId: data['shopId'] ?? '',
+      shopName: data['shopName'],
       userId: data['userId'],
       customerName: data['customerName'] ?? '',
       customerPhone: data['customerPhone'] ?? '',
@@ -264,6 +267,7 @@ class OrderModel {
   Map<String, dynamic> toFirestore() {
     return {
       'shopId': shopId,
+      'shopName': shopName,
       'userId': userId,
       'customerName': customerName,
       'customerPhone': customerPhone,

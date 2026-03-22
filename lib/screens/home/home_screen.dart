@@ -134,6 +134,7 @@ class _HomeContentState extends State<_HomeContent> {
 
   List<Map<String, dynamic>> get _restaurants => [
     {
+      'id': 'radhe_radhe_dhaba',
       'name': 'RADHE RADHE DHABA',
       'tags': ['PURE VEG', 'NORTH INDIAN', 'THALI'],
       'time': '20m',
@@ -144,6 +145,7 @@ class _HomeContentState extends State<_HomeContent> {
           'https://images.unsplash.com/photo-1742281257687-092746ad6021?fm=jpg&q=60&w=3000&auto=format&fit=crop',
     },
     {
+      'id': 'gokul_chaat_center',
       'name': 'GOKUL CHAAT CENTER',
       'tags': ['STREET FOOD', 'SPICY', 'PURE VEG'],
       'time': '12m',
@@ -154,6 +156,7 @@ class _HomeContentState extends State<_HomeContent> {
           'https://images.unsplash.com/photo-1666001120694-3ebe8fd207be?fm=jpg&q=60&w=3000&auto=format&fit=crop',
     },
     {
+      'id': 'south_indian_express',
       'name': 'SOUTH INDIAN EXPRESS',
       'tags': ['IDLI', 'DOSA', 'VEGAN FRIENDLY'],
       'time': '18m',
@@ -318,7 +321,7 @@ class _HomeContentState extends State<_HomeContent> {
             return GestureDetector(
               onTap: () => Navigator.push(
                 context,
-                MaterialPageRoute(builder: (_) => const RestaurantScreen()),
+                MaterialPageRoute(builder: (_) => RestaurantScreen(restaurant: _restaurants[0])),
               ),
               child: Container(
                 width: MediaQuery.of(context).size.width * 0.82,
@@ -485,7 +488,7 @@ class _HomeContentState extends State<_HomeContent> {
     return GestureDetector(
       onTap: () => Navigator.push(
         context,
-        MaterialPageRoute(builder: (_) => const RestaurantScreen()),
+        MaterialPageRoute(builder: (_) => RestaurantScreen(restaurant: restaurant)),
       ),
       child: Container(
         height: 120,

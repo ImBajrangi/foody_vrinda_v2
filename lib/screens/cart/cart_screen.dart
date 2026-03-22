@@ -143,7 +143,16 @@ class _CartScreenState extends State<CartScreen> {
             width: double.infinity,
             padding: const EdgeInsets.all(12),
             color: AppTheme.borderDark.withValues(alpha: 0.3),
-            child: const MonoLabel('YOUR SELECTIONS'),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                if (cart.restaurantName != null) ...[
+                  MonoLabel('ORDERING_FROM // ${cart.restaurantName!.toUpperCase()}'),
+                  const SizedBox(height: 8),
+                ],
+                const MonoLabel('YOUR SELECTIONS'),
+              ],
+            ),
           ),
           ...cart.items.map((cartItem) {
             final item = cartItem.menuItem;

@@ -7,10 +7,12 @@ import '../models/menu_item_model.dart';
 class CartProvider with ChangeNotifier {
   List<CartItemModel> _items = [];
   String? _shopId;
+  String? _restaurantName;
   bool _isInitialized = false;
 
   List<CartItemModel> get items => _items;
   String? get shopId => _shopId;
+  String? get restaurantName => _restaurantName;
   bool get isEmpty => _items.isEmpty;
   bool get isInitialized => _isInitialized;
 
@@ -18,10 +20,11 @@ class CartProvider with ChangeNotifier {
     _loadCart();
   }
 
-  void setShopId(String? id) {
+  void setShopId(String? id, {String? name}) {
     if (_shopId != id) {
       _items.clear();
       _shopId = id;
+      _restaurantName = name;
       _saveCart();
       notifyListeners();
     }
@@ -33,6 +36,7 @@ class CartProvider with ChangeNotifier {
       final prefs = await SharedPreferences.getInstance();
       final cartJson = prefs.getString('cached_cart');
       _shopId = prefs.getString('cached_shop_id');
+      _restaurantName = prefs.getString('cached_restaurant_name');
       if (cartJson != null) {
         final List<dynamic> decoded = jsonDecode(cartJson);
         final loadedItems = decoded.map((item) {
@@ -69,10 +73,17 @@ class CartProvider with ChangeNotifier {
         'quantity': item.quantity,
       }).toList());
       await prefs.setString('cached_cart', cartJson);
+      
       if (_shopId != null) {
         await prefs.setString('cached_shop_id', _shopId!);
       } else {
         await prefs.remove('cached_shop_id');
+      }
+
+      if (_restaurantName != null) {
+        await prefs.setString('cached_restaurant_name', _restaurantName!);
+      } else {
+        await prefs.remove('cached_restaurant_name');
       }
     } catch (e) {
       debugPrint('CartProvider: Error saving cart: $e');
@@ -90,8 +101,32 @@ class CartProvider with ChangeNotifier {
     notifyListeners();
   }
 
+  void loadFromOrder(dynamic order, String shopName) {
+    _items.clear();
+    _shopId = order.shopId;
+    _restaurantName = shopName;
+    
+    for (var item in order.items) {
+      _items.add(CartItemModel(
+        menuItem: MenuItemModel(
+          id: item.menuItemId,
+          shopId: order.shopId,
+          name: item.name,
+          price: item.price,
+        ),
+        quantity: item.quantity,
+      ));
+    }
+    _saveCart();
+    notifyListeners();
+  }
+
   void removeFromCart(String itemId) {
     _items.removeWhere((item) => item.menuItem.id == itemId);
+    if (_items.isEmpty) {
+      _shopId = null;
+      _restaurantName = null;
+    }
     _saveCart();
     notifyListeners();
   }
@@ -101,6 +136,10 @@ class CartProvider with ChangeNotifier {
     if (index != -1) {
       if (quantity <= 0) {
         _items.removeAt(index);
+        if (_items.isEmpty) {
+          _shopId = null;
+          _restaurantName = null;
+        }
       } else {
         _items[index].quantity = quantity;
       }
@@ -111,6 +150,8 @@ class CartProvider with ChangeNotifier {
 
   void clear() {
     _items.clear();
+    _shopId = null;
+    _restaurantName = null;
     _saveCart();
     notifyListeners();
   }

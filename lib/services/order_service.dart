@@ -11,6 +11,7 @@ class OrderService {
   // Create a new order
   Future<String> createOrder({
     required String shopId,
+    String? shopName,
     String? userId,
     required String customerName,
     required String customerPhone,
@@ -68,6 +69,7 @@ class OrderService {
 
       final orderData = {
         'shopId': shopId,
+        'shopName': shopName,
         'userId': userId,
         'customerName': customerName,
         'customerPhone': customerPhone,

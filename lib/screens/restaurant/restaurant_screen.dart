@@ -25,13 +25,11 @@ class _RestaurantScreenState extends State<RestaurantScreen> {
   final _tabs = ['Signature', 'Thalis', 'Starters', 'Sides', 'Sweets'];
 
   Map<String, dynamic> get _restaurantData => widget.restaurant ?? {
+    'id': 'vrindavan_lab_001',
     'name': 'VRINDAVAN SATTVIK LAB',
-    'tags': ['PURE VEG', 'SATTVIK', 'PREMIUM'],
-    'time': '20-30m',
-    'distance': '1.2km',
-    'match': 98,
-    'badge': '🔥 TRENDING',
-    'image': 'https://images.unsplash.com/photo-1517248135467-4c7edcad34c4',
+    'tags': ['PURE VEG', 'EXPERIMENTAL', 'SATTVIK'],
+    'time': '25m',
+    'image': 'https://images.unsplash.com/photo-1742281257687-092746ad6021?fm=jpg&q=60&w=3000&auto=format&fit=crop',
   };
 
   List<Map<String, dynamic>> get _menuItems => [
@@ -74,12 +72,20 @@ class _RestaurantScreenState extends State<RestaurantScreen> {
 
   void _addToCart(Map<String, dynamic> item, {int quantity = 1}) {
     final cart = context.read<CartProvider>();
+    if (cart.shopId != null && cart.shopId != _restaurantData['id']) {
+      // Logic for multi-restaurant confirmation could go here, 
+      // but per plan we clear and set new shop
+      cart.setShopId(_restaurantData['id'], name: _restaurantData['name']);
+    } else if (cart.shopId == null) {
+      cart.setShopId(_restaurantData['id'], name: _restaurantData['name']);
+    }
+
     final menuItem = MenuItemModel.fromMap({
       'id': item['id'] ?? item['name'],
       'name': item['name'],
       'price': (item['price'] as num).toDouble(),
       'image': item['image'],
-      'shopId': item['shopId'] ?? 'demo_shop',
+      'shopId': _restaurantData['id'],
     });
     HapticFeedback.lightImpact();
     cart.addToCart(menuItem, quantity: quantity);
