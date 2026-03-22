@@ -397,6 +397,11 @@ class OrderModel {
     return DateFormat('hh:mm a').format(createdAt!);
   }
 
+  String get formattedDate {
+    if (createdAt == null) return '';
+    return DateFormat('MMM dd, yyyy').format(createdAt!);
+  }
+
   String get importance {
     if (totalAmount >= 500) return 'High';
     if (totalAmount >= 200) return 'Medium';

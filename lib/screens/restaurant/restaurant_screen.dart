@@ -8,16 +8,30 @@ import '../food_detail/food_detail_screen.dart';
 import '../cart/cart_screen.dart';
 import '../../providers/cart_provider.dart';
 import '../../models/menu_item_model.dart';
+import '../../config/lottie_assets.dart';
+import '../../widgets/animations.dart';
 
 class RestaurantScreen extends StatefulWidget {
-  const RestaurantScreen({super.key});
+  final Map<String, dynamic>? restaurant;
+  const RestaurantScreen({super.key, this.restaurant});
   @override
   State<RestaurantScreen> createState() => _RestaurantScreenState();
 }
 
 class _RestaurantScreenState extends State<RestaurantScreen> {
   int _selectedTab = 0;
+  bool _showPulse = false;
   final _tabs = ['Signature', 'Thalis', 'Starters', 'Sides', 'Sweets'];
+
+  Map<String, dynamic> get _restaurantData => widget.restaurant ?? {
+    'name': 'VRINDAVAN SATTVIK LAB',
+    'tags': ['PURE VEG', 'SATTVIK', 'PREMIUM'],
+    'time': '20-30m',
+    'distance': '1.2km',
+    'match': 98,
+    'badge': '🔥 TRENDING',
+    'image': 'https://images.unsplash.com/photo-1517248135467-4c7edcad34c4',
+  };
 
   List<Map<String, dynamic>> get _menuItems => [
     {
@@ -67,6 +81,10 @@ class _RestaurantScreenState extends State<RestaurantScreen> {
       'shopId': item['shopId'] ?? 'demo_shop',
     });
     cart.addToCart(menuItem, quantity: quantity);
+    setState(() => _showPulse = true);
+    Future.delayed(const Duration(seconds: 2), () {
+      if (mounted) setState(() => _showPulse = false);
+    });
   }
 
   @override
@@ -113,8 +131,7 @@ class _RestaurantScreenState extends State<RestaurantScreen> {
           fit: StackFit.expand,
           children: [
             CachedNetworkImage(
-              imageUrl:
-                  'https://images.unsplash.com/photo-1742281257687-092746ad6021?fm=jpg&q=60&w=3000&auto=format&fit=crop',
+              imageUrl: _restaurantData['image'],
               fit: BoxFit.cover,
             ),
             Container(
@@ -159,7 +176,7 @@ class _RestaurantScreenState extends State<RestaurantScreen> {
                   ),
                   const SizedBox(height: 8),
                   Text(
-                    'VRINDAVAN SATTVIK LAB',
+                    _restaurantData['name'].toString().toUpperCase(),
                     style: GoogleFonts.spaceGrotesk(
                       fontSize: 28,
                       fontWeight: FontWeight.w700,
@@ -171,14 +188,14 @@ class _RestaurantScreenState extends State<RestaurantScreen> {
                   Row(
                     children: [
                       Text(
-                        'Japanese • 0.4mi • ',
+                        'SATTVIK • ${_restaurantData['distance']} • ',
                         style: GoogleFonts.jetBrainsMono(
                           fontSize: 12,
                           color: AppTheme.textSecondary,
                         ),
                       ),
                       Text(
-                        'Open until 3am',
+                        _restaurantData['badge'] ?? 'OPEN NOW',
                         style: GoogleFonts.jetBrainsMono(
                           fontSize: 12,
                           color: AppTheme.success,
@@ -279,7 +296,7 @@ class _RestaurantScreenState extends State<RestaurantScreen> {
 
   Widget _buildTabs() {
     return Container(
-      height: 48,
+      height: 60,
       decoration: BoxDecoration(
         color: AppTheme.background.withValues(alpha: 0.95),
         border: const Border(bottom: BorderSide(color: AppTheme.borderDark)),
@@ -288,28 +305,41 @@ class _RestaurantScreenState extends State<RestaurantScreen> {
         scrollDirection: Axis.horizontal,
         padding: const EdgeInsets.symmetric(horizontal: 16),
         itemCount: _tabs.length,
-        separatorBuilder: (_, _) => const SizedBox(width: 24),
+        separatorBuilder: (_, __) => const SizedBox(width: 12),
         itemBuilder: (context, i) {
           final active = i == _selectedTab;
+          String lottieUrl = LottieAssets.pizzaSlices;
+          if (_tabs[i] == 'Thalis') lottieUrl = LottieAssets.cooking;
+          if (_tabs[i] == 'Starters') lottieUrl = LottieAssets.walkingBroccoli;
+          if (_tabs[i] == 'Sides') lottieUrl = LottieAssets.growingTomatoes;
+          if (_tabs[i] == 'Sweets') lottieUrl = LottieAssets.potato;
+
           return GestureDetector(
             onTap: () => setState(() => _selectedTab = i),
             child: Container(
               alignment: Alignment.center,
+              padding: const EdgeInsets.symmetric(horizontal: 12),
               decoration: BoxDecoration(
                 border: Border(
                   bottom: BorderSide(
                     color: active ? AppTheme.primary : Colors.transparent,
-                    width: 2,
+                    width: 3,
                   ),
                 ),
               ),
-              child: Text(
-                _tabs[i].toUpperCase(),
-                style: GoogleFonts.spaceGrotesk(
-                  fontSize: 14,
-                  fontWeight: active ? FontWeight.w700 : FontWeight.w500,
-                  color: active ? AppTheme.primary : AppTheme.textSecondary,
-                ),
+              child: Row(
+                children: [
+                  LottieAssets.build(lottieUrl, width: 24, height: 24),
+                  const SizedBox(width: 8),
+                  Text(
+                    _tabs[i].toUpperCase(),
+                    style: GoogleFonts.spaceGrotesk(
+                      fontSize: 13,
+                      fontWeight: active ? FontWeight.w800 : FontWeight.w600,
+                      color: active ? AppTheme.primary : AppTheme.textSecondary,
+                    ),
+                  ),
+                ],
               ),
             ),
           );
@@ -409,7 +439,7 @@ class _RestaurantScreenState extends State<RestaurantScreen> {
                   ),
                   const SizedBox(height: 8),
                   Text(
-                    '\$${(item['price'] as double).toStringAsFixed(2)}',
+                    '₹${(item['price'] as double).toStringAsFixed(0)}',
                     style: GoogleFonts.jetBrainsMono(
                       fontSize: 14,
                       fontWeight: FontWeight.w700,
@@ -481,11 +511,15 @@ class _RestaurantScreenState extends State<RestaurantScreen> {
       bottom: 16,
       left: 16,
       right: 16,
-      child: GestureDetector(
-        onTap: () => Navigator.push(
-          context,
-          MaterialPageRoute(builder: (_) => const CartScreen()),
-        ),
+      child: PulseAnimation(
+        animate: _showPulse,
+        child: GestureDetector(
+          onTap: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (_) => const CartScreen()),
+            );
+          },
         child: Container(
           padding: const EdgeInsets.all(16),
           decoration: BoxDecoration(
@@ -551,6 +585,7 @@ class _RestaurantScreenState extends State<RestaurantScreen> {
           ),
         ),
       ),
+    ),
     );
   }
 }

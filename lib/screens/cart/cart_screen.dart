@@ -6,6 +6,8 @@ import '../../config/app_theme.dart';
 import '../../widgets/industrial_widgets.dart';
 import '../../providers/cart_provider.dart';
 import '../payment/payment_screen.dart';
+import '../../config/lottie_assets.dart';
+import '../../widgets/animations.dart';
 
 class CartScreen extends StatelessWidget {
   const CartScreen({super.key});
@@ -64,22 +66,12 @@ class CartScreen extends StatelessWidget {
             // Empty State
             if (items.isEmpty)
               Expanded(
-                child: Center(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      const Icon(Icons.shopping_bag_outlined, size: 64, color: AppTheme.textSecondary),
-                      const SizedBox(height: 16),
-                      Text(
-                        'YOUR CART IS EMPTY',
-                        style: GoogleFonts.spaceGrotesk(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w700,
-                          color: AppTheme.textSecondary,
-                        ),
-                      ),
-                    ],
-                  ),
+                child: EmptyState(
+                  title: 'YOUR CART IS EMPTY',
+                  subtitle: 'Add some delicious items to get started!',
+                  animationUrl: LottieAssets.emptyCart,
+                  onAction: () => Navigator.pop(context),
+                  actionLabel: 'EXPLORE MENU',
                 ),
               )
             else

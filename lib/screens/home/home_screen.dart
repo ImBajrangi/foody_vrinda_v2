@@ -3,10 +3,12 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import '../../config/app_theme.dart';
 import '../../widgets/industrial_widgets.dart';
+import '../../config/lottie_assets.dart';
 import '../restaurant/restaurant_screen.dart';
 import '../favorites/favorites_screen.dart';
 import '../cart/cart_screen.dart';
 import '../profile/profile_screen.dart';
+import '../search/search_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -96,13 +98,13 @@ class _HomeContentState extends State<_HomeContent> {
   final _scrollController = ScrollController();
 
   List<Map<String, String>> get _categories => [
-    {'emoji': '🍱', 'label': 'THALI'},
-    {'emoji': '🫓', 'label': 'ROTI/NAAN'},
-    {'emoji': '🍮', 'label': 'SWEETS'},
-    {'emoji': '🍲', 'label': 'PANEER'},
-    {'emoji': '🥞', 'label': 'DOSA'},
-    {'emoji': '🥡', 'label': 'STREET'},
-    {'emoji': '🥤', 'label': 'DRINKS'},
+    {'lottie': LottieAssets.cooking, 'label': 'THALI'},
+    {'lottie': LottieAssets.pizzaSlices, 'label': 'ROTI/NAAN'},
+    {'lottie': LottieAssets.potato, 'label': 'SWEETS'},
+    {'lottie': LottieAssets.growingTomatoes, 'label': 'PANEER'},
+    {'lottie': LottieAssets.walkingBroccoli, 'label': 'STARTERS'},
+    {'lottie': LottieAssets.foodDelivery, 'label': 'STREET'},
+    {'lottie': LottieAssets.dotsLoading, 'label': 'DRINKS'},
   ];
 
   List<Map<String, dynamic>> get _heroCards => [
@@ -197,35 +199,41 @@ class _HomeContentState extends State<_HomeContent> {
       child: Row(
         children: [
           Expanded(
-            child: Container(
-              height: 44,
-              decoration: BoxDecoration(
-                color: AppTheme.surface,
-                borderRadius: BorderRadius.circular(AppTheme.radiusMd),
-                border: Border.all(color: AppTheme.borderDark),
+            child: GestureDetector(
+              onTap: () => Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => const SearchScreen()),
               ),
-              child: Row(
-                children: [
-                  const Padding(
-                    padding: EdgeInsets.only(left: 12),
-                    child: Icon(
-                      Icons.terminal,
-                      color: AppTheme.primary,
-                      size: 20,
-                    ),
-                  ),
-                  const SizedBox(width: 8),
-                  Expanded(
-                    child: Text(
-                      'SEARCH COMMAND...',
-                      style: GoogleFonts.jetBrainsMono(
-                        fontSize: 12,
-                        color: AppTheme.textSecondary,
-                        letterSpacing: 1.5,
+              child: Container(
+                height: 44,
+                decoration: BoxDecoration(
+                  color: AppTheme.surface,
+                  borderRadius: BorderRadius.circular(AppTheme.radiusMd),
+                  border: Border.all(color: AppTheme.borderDark),
+                ),
+                child: Row(
+                  children: [
+                    const Padding(
+                      padding: EdgeInsets.only(left: 12),
+                      child: Icon(
+                        Icons.terminal,
+                        color: AppTheme.primary,
+                        size: 20,
                       ),
                     ),
-                  ),
-                ],
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: Text(
+                        'SEARCH COMMAND...',
+                        style: GoogleFonts.jetBrainsMono(
+                          fontSize: 12,
+                          color: AppTheme.textSecondary,
+                          letterSpacing: 1.5,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
               ),
             ),
           ),
@@ -252,17 +260,40 @@ class _HomeContentState extends State<_HomeContent> {
         border: Border(bottom: BorderSide(color: AppTheme.borderDark)),
       ),
       child: SizedBox(
-        height: 96,
+        height: 100,
         child: ListView.separated(
           scrollDirection: Axis.horizontal,
           padding: const EdgeInsets.symmetric(horizontal: 16),
           itemCount: _categories.length,
-          separatorBuilder: (_, _) => const SizedBox(width: 16),
-          itemBuilder: (context, i) => CategoryChip(
-            icon: _categories[i]['emoji']!,
-            label: _categories[i]['label']!,
-            onTap: () {},
-          ),
+          separatorBuilder: (_, __) => const SizedBox(width: 16),
+          itemBuilder: (context, i) {
+            final cat = _categories[i];
+            return Column(
+              children: [
+                Container(
+                  width: 60,
+                  height: 60,
+                  padding: const EdgeInsets.all(4),
+                  decoration: BoxDecoration(
+                    color: AppTheme.surface,
+                    borderRadius: BorderRadius.circular(4),
+                    border: Border.all(color: AppTheme.borderDark, width: 1.5),
+                  ),
+                  child: LottieAssets.build(cat['lottie']!, width: 44, height: 44),
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  cat['label']!,
+                  style: GoogleFonts.spaceGrotesk(
+                    fontSize: 9,
+                    fontWeight: FontWeight.w700,
+                    color: AppTheme.textSecondary,
+                    letterSpacing: 1,
+                  ),
+                ),
+              ],
+            );
+          },
         ),
       ),
     );

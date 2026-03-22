@@ -7,6 +7,7 @@ import '../../widgets/industrial_widgets.dart';
 import '../../models/shop_model.dart';
 import '../../models/menu_item_model.dart';
 import '../../providers/cart_provider.dart';
+import '../../widgets/animations.dart';
 
 class FoodDetailScreen extends StatefulWidget {
   final Map<String, dynamic> item;
@@ -22,6 +23,7 @@ class FoodDetailScreen extends StatefulWidget {
 
 class _FoodDetailScreenState extends State<FoodDetailScreen> {
   int _quantity = 1;
+  bool _isAdded = false;
   int _baseSelection = 0;
   double _spiceLevel = 2;
   final List<bool> _addOns = [false, true, false, false];
@@ -32,9 +34,9 @@ class _FoodDetailScreenState extends State<FoodDetailScreen> {
     {'name': 'Chili Oil Jar', 'price': 5.00},
   ];
   final _bases = [
-    {'name': 'Egg Noodles', 'price': 'INCLUDED'},
-    {'name': 'Rice Noodles', 'price': '+\$1.00'},
-    {'name': 'Udon Noodles', 'price': '+\$1.50'},
+    {'name': 'Wheat Noodles', 'price': 'INCLUDED'},
+    {'name': 'Rice Noodles', 'price': '+₹60'},
+    {'name': 'Udon Noodles', 'price': '+₹120'},
   ];
 
   double get _totalPrice {
@@ -172,7 +174,7 @@ class _FoodDetailScreenState extends State<FoodDetailScreen> {
                             crossAxisAlignment: CrossAxisAlignment.end,
                             children: [
                               Text(
-                                '\$${(widget.item['price'] as double).toStringAsFixed(2)}',
+                                '₹${(widget.item['price'] as double).toStringAsFixed(0)}',
                                 style: GoogleFonts.jetBrainsMono(
                                   fontSize: 22,
                                   fontWeight: FontWeight.w700,
@@ -415,7 +417,7 @@ class _FoodDetailScreenState extends State<FoodDetailScreen> {
               ],
             ),
             MonoLabel(
-              '+\$${(_addOnItems[i]['price'] as double).toStringAsFixed(2)}',
+              '+₹${(_addOnItems[i]['price'] as double).toStringAsFixed(0)}',
               color: Colors.grey[400],
             ),
           ],
@@ -481,37 +483,17 @@ class _FoodDetailScreenState extends State<FoodDetailScreen> {
               ],
             ),
             const SizedBox(height: 12),
-            PrimaryButton(
-              label: 'Add to Order',
-              trailing: Row(
-                children: [
-                  Text(
-                    '\$${_totalPrice.toStringAsFixed(2)}',
-                    style: GoogleFonts.jetBrainsMono(
-                      fontSize: 16,
-                      fontWeight: FontWeight.w700,
-                      color: Colors.white,
-                    ),
-                  ),
-                  const SizedBox(width: 8),
-                  Container(
-                    padding: const EdgeInsets.all(4),
-                    decoration: BoxDecoration(
-                      color: Colors.black26,
-                      borderRadius: BorderRadius.circular(2),
-                    ),
-                    child: const Icon(
-                      Icons.arrow_forward,
-                      size: 14,
-                      color: Colors.white,
-                    ),
-                  ),
-                ],
-              ),
-                onPressed: () {
-                  widget.onAddToCart(_quantity);
-                  Navigator.pop(context);
-                },
+            BouncyAddButton(
+              isAdded: _isAdded,
+              label: 'ADD TO ORDER • ₹${_totalPrice.toStringAsFixed(0)}',
+              onPressed: () {
+                if (_isAdded) return;
+                setState(() => _isAdded = true);
+                widget.onAddToCart(_quantity);
+                Future.delayed(const Duration(milliseconds: 600), () {
+                  if (mounted) Navigator.pop(context);
+                });
+              },
             ),
           ],
         ),

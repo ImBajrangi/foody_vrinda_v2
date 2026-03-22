@@ -22,7 +22,7 @@ class ResourceCacheService {
       LottieAssets.loading,
       LottieAssets.foodLoading,
       LottieAssets.success,
-      LottieAssets.error,
+      LottieAssets.dotsLoading,
       'https://imbajrangi.github.io/Company/Vrindopnishad%20Web/class/logo/foodyVrinda-logo.png',
     ];
 
@@ -40,24 +40,23 @@ class ResourceCacheService {
       case UserRole.kitchen:
         roleSpecificAssets = [
           LottieAssets.cooking,
-          LottieAssets.preparing,
-          LottieAssets.ready,
-          LottieAssets.newOrder,
+          LottieAssets.foodLoading,
+          LottieAssets.dotsLoading,
+          LottieAssets.celebration,
         ];
         break;
       case UserRole.delivery:
         roleSpecificAssets = [
           LottieAssets.delivery,
           LottieAssets.foodDelivery,
-          LottieAssets.outForDelivery,
-          LottieAssets.ready,
+          LottieAssets.deliveryScooter,
+          LottieAssets.dotsLoading,
         ];
         break;
       case UserRole.owner:
       case UserRole.developer:
         roleSpecificAssets = [
           LottieAssets.noData,
-          LottieAssets.profile,
           LottieAssets.celebration,
         ];
         break;

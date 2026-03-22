@@ -1,13 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:provider/provider.dart';
 import '../../config/app_theme.dart';
 import '../../widgets/industrial_widgets.dart';
+import '../../providers/auth_provider.dart';
+import '../order/order_history_screen.dart';
+import '../dashboard/dashboard_screen.dart';
 
 class ProfileScreen extends StatelessWidget {
   const ProfileScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final authProvider = Provider.of<AuthProvider>(context);
     return Scaffold(
       backgroundColor: AppTheme.background,
       body: CustomScrollView(
@@ -61,10 +66,24 @@ class ProfileScreen extends StatelessWidget {
               delegate: SliverChildListDelegate([
                 _buildStatRow(),
                 const SizedBox(height: 24),
-                _profileOption(Icons.terminal, 'MY_ACCOUNT'),
-                _profileOption(Icons.history, 'ORDER_HISTORY'),
-                _profileOption(Icons.wallet, 'WALLET_BALANCE'),
-                _profileOption(Icons.settings, 'SYSTEM_CONFIG'),
+                _profileOption(Icons.terminal, 'MY_ACCOUNT', () {}),
+                if (authProvider.userData?.isStaff ?? false)
+                  _profileOption(Icons.dashboard, 'ADMIN_CONSOLE', () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const DashboardScreen(),
+                      ),
+                    );
+                  }),
+                _profileOption(Icons.history, 'ORDER_HISTORY', () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => const OrderHistoryScreen()),
+                  );
+                }),
+                _profileOption(Icons.wallet, 'WALLET_BALANCE', () {}),
+                _profileOption(Icons.settings, 'SYSTEM_CONFIG', () {}),
                 const SizedBox(height: 32),
                 PrimaryButton(
                   label: 'DISCONNECT_SESSION',
@@ -112,7 +131,7 @@ class ProfileScreen extends StatelessWidget {
     );
   }
 
-  Widget _profileOption(IconData icon, String label) {
+  Widget _profileOption(IconData icon, String label, VoidCallback onTap) {
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
       decoration: BoxDecoration(
@@ -129,8 +148,8 @@ class ProfileScreen extends StatelessWidget {
             color: Colors.white,
           ),
         ),
-        trailing: const Icon(Icons.chevron_right, color: AppTheme.borderDark),
-        onTap: () {},
+        trailing: const Icon(Icons.chevron_right, color: AppTheme.borderDark, size: 16),
+        onTap: onTap,
       ),
     );
   }

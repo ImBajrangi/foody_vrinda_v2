@@ -7,6 +7,8 @@ import 'config/app_theme.dart';
 import 'providers/cart_provider.dart';
 import 'services/order_service.dart';
 import 'services/auth_service.dart';
+import 'services/shop_service.dart';
+import 'providers/auth_provider.dart';
 import 'screens/home/home_screen.dart';
 
 void main() async {
@@ -28,9 +30,11 @@ void main() async {
   runApp(
     MultiProvider(
       providers: [
+        ChangeNotifierProvider(create: (_) => AuthProvider()),
         ChangeNotifierProvider(create: (_) => CartProvider()),
         Provider(create: (_) => OrderService()),
         Provider(create: (_) => AuthService()),
+        Provider(create: (_) => ShopService()),
       ],
       child: const FoodyVrindaV2App(),
     ),

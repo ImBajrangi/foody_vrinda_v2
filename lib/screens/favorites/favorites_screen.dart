@@ -69,7 +69,7 @@ class FavoritesScreen extends StatelessWidget {
                                     MainAxisAlignment.spaceBetween,
                                 children: [
                                   Text(
-                                    '\$12.00',
+                                    '₹850',
                                     style: GoogleFonts.jetBrainsMono(
                                       fontWeight: FontWeight.w700,
                                       color: AppTheme.primary,
