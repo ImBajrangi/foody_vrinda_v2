@@ -55,8 +55,7 @@ class TrackingScreen extends StatelessWidget {
                         ),
                         clipBehavior: Clip.antiAlias,
                         child: CachedNetworkImage(
-                          imageUrl:
-                              'https://lh3.googleusercontent.com/aida-public/AB6AXuBtxzTSpwD7ymXH8Sx6_YMluG00XCFwa_TizFynnoQYp2XKskf3PCRiGFBVSa8mA4w6SjuMnjTIyxRzJGjpFBfZvNYBiIiUSj_4HfedahlL3GsEJbpsskef0S_4acm4lFsQTOqmxegWmOyrwaQBsorhnCYGVOhykCKSSuIuPdoKXxHhL84uIh1H-_B53O0lThH4RUOc1Ekinyfy8s0DJFEdJuzRNrfOS0RocBCrkJqPVR6msBlIPZ9L3TgUy9SfAKXvVmUFEiCcrrXN',
+                          imageUrl: 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&w=100&q=80',
                           fit: BoxFit.cover,
                         ),
                       ),
@@ -384,7 +383,7 @@ class TrackingScreen extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'JASON B.',
+                  'RAHUL S.',
                   style: GoogleFonts.spaceGrotesk(
                     fontSize: 14,
                     fontWeight: FontWeight.w700,
@@ -404,7 +403,7 @@ class TrackingScreen extends StatelessWidget {
                         borderRadius: BorderRadius.circular(2),
                         border: Border.all(color: AppTheme.borderDark),
                       ),
-                      child: const MonoLabel('YAMAHA NMAX'),
+                      child: const MonoLabel('EV ECO-SCOOTER'),
                     ),
                     const SizedBox(width: 8),
                     Text(

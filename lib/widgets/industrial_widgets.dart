@@ -198,6 +198,30 @@ class MatchScoreBadge extends StatelessWidget {
   }
 }
 
+class VegIndicator extends StatelessWidget {
+  final double size;
+  const VegIndicator({super.key, this.size = 12});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: size,
+      height: size,
+      padding: const EdgeInsets.all(2),
+      decoration: BoxDecoration(
+        border: Border.all(color: AppTheme.pureVeg, width: 1),
+        borderRadius: BorderRadius.circular(1),
+      ),
+      child: Container(
+        decoration: const BoxDecoration(
+          color: AppTheme.pureVeg,
+          shape: BoxShape.circle,
+        ),
+      ),
+    );
+  }
+}
+
 class IndustrialTag extends StatelessWidget {
   final String text;
   final Color? textColor;

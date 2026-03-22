@@ -16,47 +16,43 @@ class _RestaurantScreenState extends State<RestaurantScreen> {
   int _selectedTab = 0;
   int _cartCount = 0;
   double _cartTotal = 0;
-  final _tabs = ['Signature', 'Nigiri', 'Sashimi', 'Robata', 'Drinks'];
+  final _tabs = ['Signature', 'Thalis', 'Starters', 'Sides', 'Sweets'];
 
-  final _menuItems = [
+  List<Map<String, dynamic>> get _menuItems => [
     {
-      'name': 'Neon Salmon Roll',
-      'desc': 'Torched salmon, spicy mayo, cucumber, micro-greens.',
-      'price': 14.00,
+      'name': 'Paneer Tikka Platter',
+      'desc': 'Clay-oven roasted cottage cheese, mint chutney, masala onions.',
+      'price': 12.00,
       'tags': ['SPICY', 'GF'],
-      'image':
-          'https://lh3.googleusercontent.com/aida-public/AB6AXuAvLEAD-PSZezlwbAb0em_68GgVw8y3vFAC6U8U0NHD99lcG_kCP_HKR6aVF47WL4iQ7xedj_V-3ScCjoxMOa_Vgwf0OkTznD2f7ha6kxTl6X4mM21TwpTxrZlhQ78chmwcbrjl_uJCTLtA4u8KxYz39XZTMRnAjpkBXdDCp3wc1JGpDR5GFgEJOKtBIoQM03U4CU0-kG-bCVU51Gwb474CMDCP_neb-fORGBdMEe3nrCj3IAb-gyjdF2qC3GHJPbPEHnwSW-Zhk4Hs',
+      'image': 'https://images.unsplash.com/photo-1666001120694-3ebe8fd207be?fm=jpg&q=60&w=3000&auto=format&fit=crop',
     },
     {
-      'name': 'Data Crunch Tuna',
-      'desc': 'Bluefin tuna, tempura flakes, truffle oil, avocado.',
-      'price': 16.50,
-      'tags': ['RAW'],
-      'image':
-          'https://lh3.googleusercontent.com/aida-public/AB6AXuDAIle-hIGJ6uQAjfT2G2p_HmkV76QEJ6CdWE96G8CXJ_HAYOzo8cb04HsiF5AiIs3-eDyOnKeX_v88KavOJRH0IPzTa_PLG63KeQ7vkwf_oQl_WkmkzYvy7lBIzKqle2YCP4SELD6CvLqtJZ40uJhP_4uysR95uRUUrhQJRgVlZvR7aCJAC5x9JBnqaVak8wyL8Z21yY8gNCjxU8rqzKUE2DnnzmEZ6uvBsOjcWKiGvLQe6h-ptZlu2vZKjaqOQTNjQHMOAkHz6K5R',
+      'name': 'Dal Makhani High-Sync',
+      'desc': 'Slow-cooked black lentils, creamy texture, served with butter.',
+      'price': 10.50,
+      'tags': ['POPULAR'],
+      'image': 'https://images.unsplash.com/photo-1742281257687-092746ad6021?fm=jpg&q=60&w=3000&auto=format&fit=crop',
     },
     {
-      'name': 'Binary Edamame',
-      'desc': 'Steamed soybeans, sea salt. Simple and efficient.',
-      'price': 6.00,
+      'name': 'Binary Butter Naan',
+      'desc': 'Traditional leavened bread with premium butter glaze.',
+      'price': 3.50,
       'tags': <String>[],
       'image': null,
     },
     {
-      'name': 'Phantom Unagi Bowl',
-      'desc': 'Grilled freshwater eel over rice, unagi sauce.',
-      'price': 18.00,
-      'tags': ['POPULAR'],
-      'image':
-          'https://lh3.googleusercontent.com/aida-public/AB6AXuDdyflSpdKYeIyCuIEBUKMBkBNFX0qac9Xn6BlbXvBwVMUnM09hGcRNGsisWXE5oaZ1O4KguP8m0hMfNwSQVwcdc9GPAvLJQ2Z2LquAkZIjBofvmv9dy9KknQ8jLAcAj0_xtr_7lbadiAg_Clei-fsWPiseFD3HzxOYBoj2UqetNP2nFuu6sCHml0zn0hTr0QI9TYzSoaFsr-EqDRXsqlPvpNRfHphVOyEIzhYbylZ0HINtjEvHxUIuP1qFnv9YlS-MhwSQc7-6Q0S8',
+      'name': 'Cyber Chole Bhature',
+      'desc': 'Spicy chickpea curry with fluffy deep-fried bread.',
+      'price': 9.00,
+      'tags': ['SIGNATURE'],
+      'image': 'https://images.unsplash.com/photo-1668236543090-82eba5ee5976?fm=jpg&q=60&w=3000&auto=format&fit=crop',
     },
     {
-      'name': 'Yakitori Skewers',
-      'desc': 'Chicken thigh, scallion, tare sauce over charcoal.',
-      'price': 8.00,
+      'name': 'Gulab Jamun Matrix',
+      'desc': 'Soft khoya balls in rose-scented sugar syrup.',
+      'price': 5.00,
       'tags': <String>[],
-      'image':
-          'https://lh3.googleusercontent.com/aida-public/AB6AXuA1RnTWCpGatAdkh9dKC_JBM5F8JRiO2dxom3C_blmn0r10wFfv_m6-A86FpR4NRW0u4SPwLEbzABDwBvuBRQ2QOy_LZ2tTCLt6aw4KG-8j8HP5kavdHC2rRZv3twV7_9kY9r1ADHr4howxE8FBmYZDvEX_CSjVURSondqdMtJD4GO9cc0Z4c1rQ3zbpx6tKyFAn2dEgce1VFnLqA4DL2A8vw8a-9qBdJOkhBIWDGXEzeZt_cRZbv-nsNo-5uSQZARsdZuxl0C0e1nN',
+      'image': 'https://images.unsplash.com/photo-1666190092159-3171cf0fbb12?fm=jpg&q=60&w=3000&auto=format&fit=crop',
     },
   ];
 
@@ -70,6 +66,7 @@ class _RestaurantScreenState extends State<RestaurantScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      key: UniqueKey(), // Force rebuild
       backgroundColor: AppTheme.background,
       body: Stack(
         children: [
@@ -109,7 +106,7 @@ class _RestaurantScreenState extends State<RestaurantScreen> {
           children: [
             CachedNetworkImage(
               imageUrl:
-                  'https://lh3.googleusercontent.com/aida-public/AB6AXuDhThSND04FxiD6b2JLcZzkUMiuxneLJs7xxcwcXPzqrLo7AFNPo44PDts-RWOmSxZ4I5N0S98oxWVuS-Dv2dC0TUZsgZMWsSEXy2Ui14k0dd70nLRV41bl2AvschPX4kd2zrmOSnUVr-aVCIfaffVAmtCGpREd3P91I2Gl21Zt2jT1ObdWPs8Ip6DHKKSWv4oCVky-gmJwMzANSkndZnQgqNqeOtEkdtOtUb1lY1RG6SWvpeL-XsWXgCIjZculFfsagqsv5Nw-hn0U',
+                  'https://images.unsplash.com/photo-1742281257687-092746ad6021?fm=jpg&q=60&w=3000&auto=format&fit=crop',
               fit: BoxFit.cover,
             ),
             Container(
@@ -154,7 +151,7 @@ class _RestaurantScreenState extends State<RestaurantScreen> {
                   ),
                   const SizedBox(height: 8),
                   Text(
-                    'Cyber Sushi Lab',
+                    'VRINDAVAN SATTVIK LAB',
                     style: GoogleFonts.spaceGrotesk(
                       fontSize: 28,
                       fontWeight: FontWeight.w700,
@@ -275,9 +272,9 @@ class _RestaurantScreenState extends State<RestaurantScreen> {
   Widget _buildTabs() {
     return Container(
       height: 48,
-      color: AppTheme.background.withValues(alpha: 0.95),
-      decoration: const BoxDecoration(
-        border: Border(bottom: BorderSide(color: AppTheme.borderDark)),
+      decoration: BoxDecoration(
+        color: AppTheme.background.withValues(alpha: 0.95),
+        border: const Border(bottom: BorderSide(color: AppTheme.borderDark)),
       ),
       child: ListView.separated(
         scrollDirection: Axis.horizontal,
@@ -322,7 +319,7 @@ class _RestaurantScreenState extends State<RestaurantScreen> {
           Row(
             children: [
               Text(
-                'SIGNATURE ROLLS',
+                'SATTVIK SELECTIONS',
                 style: GoogleFonts.spaceGrotesk(
                   fontSize: 18,
                   fontWeight: FontWeight.w700,
@@ -330,7 +327,7 @@ class _RestaurantScreenState extends State<RestaurantScreen> {
                 ),
               ),
               const Spacer(),
-              const MonoLabel('8 ITEMS'),
+              const MonoLabel('PURE VEG'),
             ],
           ),
           ..._menuItems.map((item) => _menuItem(item)),
@@ -423,29 +420,22 @@ class _RestaurantScreenState extends State<RestaurantScreen> {
                 children: [
                   Container(
                     decoration: BoxDecoration(
+                      color: AppTheme.surface,
                       borderRadius: BorderRadius.circular(4),
                       border: Border.all(color: AppTheme.borderDark),
                     ),
                     clipBehavior: Clip.antiAlias,
-                    child: item['image'] != null
-                        ? CachedNetworkImage(
-                            imageUrl: item['image'] as String,
-                            fit: BoxFit.cover,
-                            width: 80,
-                            height: 80,
-                          )
-                        : Container(
-                            width: 80,
-                            height: 80,
-                            color: AppTheme.surface,
-                            child: const Center(
-                              child: Icon(
-                                Icons.restaurant,
-                                color: AppTheme.borderDark,
-                                size: 32,
-                              ),
-                            ),
-                          ),
+                    child: CachedNetworkImage(
+                      imageUrl: item['image'] as String? ?? '',
+                      fit: BoxFit.cover,
+                      errorWidget: (_, __, ___) => const Center(
+                        child: Icon(
+                          Icons.restaurant,
+                          color: AppTheme.borderDark,
+                          size: 32,
+                        ),
+                      ),
+                    ),
                   ),
                   Positioned(
                     bottom: -8,

@@ -45,8 +45,7 @@ class FavoritesScreen extends StatelessWidget {
                           ),
                           clipBehavior: Clip.antiAlias,
                           child: CachedNetworkImage(
-                            imageUrl:
-                                'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=150&q=80',
+                            imageUrl: 'https://images.unsplash.com/photo-1742281257687-092746ad6021?fm=jpg&q=60&w=3000&auto=format&fit=crop',
                             fit: BoxFit.cover,
                           ),
                         ),
@@ -56,14 +55,14 @@ class FavoritesScreen extends StatelessWidget {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
-                                'GARDEN_SALAD'.toUpperCase(),
+                                'PANEER_TIKKA_SALAD'.toUpperCase(),
                                 style: GoogleFonts.spaceGrotesk(
                                   fontSize: 16,
                                   fontWeight: FontWeight.w700,
                                   color: Colors.white,
                                 ),
                               ),
-                              const MonoLabel('Fresh greens // Avocado'),
+                              const MonoLabel('Grilled Paneer // Mint // Fresh Greens'),
                               const SizedBox(height: 12),
                               Row(
                                 mainAxisAlignment:

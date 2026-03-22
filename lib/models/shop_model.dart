@@ -321,6 +321,32 @@ class ShopModel {
   }) : schedule = schedule ?? ShopSchedule(),
        alarmSettings = alarmSettings ?? AlarmSettings();
 
+  /// Sanitizes broken Unsplash URLs with verified alternatives
+  static String? sanitizeUrl(String? url) {
+    if (url == null) return null;
+    
+    // Check for known broken Unsplash IDs and replace with verified ones
+    if (url.contains('photo-1626777552726-4a6b547b4de5') || 
+        url.contains('photo-1546833999-b9f581a1996d') ||
+        url.contains('photo-1567188040759-fb8a883dc6d8')) {
+      return 'https://images.unsplash.com/photo-1742281257687-092746ad6021?fm=jpg&q=60&w=3000&auto=format&fit=crop'; // Verified Thali
+    }
+    
+    if (url.contains('photo-1589301773859-daaa0486c96b')) {
+      return 'https://images.unsplash.com/photo-1668236543090-82eba5ee5976?fm=jpg&q=60&w=3000&auto=format&fit=crop'; // Verified Dosa
+    }
+
+    if (url.contains('photo-1589119908995-c6837fa14848')) {
+      return 'https://images.unsplash.com/photo-1666190092159-3171cf0fbb12?fm=jpg&q=60&w=3000&auto=format&fit=crop'; // Verified Sweets
+    }
+
+    if (url.contains('photo-1601050690597-df0568f70950')) {
+      return 'https://images.unsplash.com/photo-1666001120694-3ebe8fd207be?fm=jpg&q=60&w=3000&auto=format&fit=crop'; // Verified Paneer
+    }
+    
+    return url;
+  }
+
   factory ShopModel.fromFirestore(DocumentSnapshot doc) {
     final data = doc.data() as Map<String, dynamic>?;
     if (data == null) {
@@ -328,7 +354,7 @@ class ShopModel {
     }
 
     // Handle both 'image' and 'imageUrl' field names
-    String? image = data['imageUrl'] ?? data['image'];
+    String? image = sanitizeUrl(data['imageUrl'] ?? data['image']);
 
     // Parse schedule - handle both object and non-existent cases
     ShopSchedule schedule;

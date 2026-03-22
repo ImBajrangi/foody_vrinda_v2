@@ -95,83 +95,74 @@ class _HomeContent extends StatefulWidget {
 class _HomeContentState extends State<_HomeContent> {
   final _scrollController = ScrollController();
 
-  final _categories = [
-    {'emoji': '🍕', 'label': 'PIZZA'},
-    {'emoji': '🍔', 'label': 'BURGER'},
-    {'emoji': '🍜', 'label': 'RAMEN'},
-    {'emoji': '🍣', 'label': 'SUSHI'},
-    {'emoji': '☕', 'label': 'COFFEE'},
-    {'emoji': '🌮', 'label': 'TACOS'},
-    {'emoji': '🍛', 'label': 'CURRY'},
+  List<Map<String, String>> get _categories => [
+    {'emoji': '🍱', 'label': 'THALI'},
+    {'emoji': '🫓', 'label': 'ROTI/NAAN'},
+    {'emoji': '🍮', 'label': 'SWEETS'},
+    {'emoji': '🍲', 'label': 'PANEER'},
+    {'emoji': '🥞', 'label': 'DOSA'},
+    {'emoji': '🥡', 'label': 'STREET'},
+    {'emoji': '🥤', 'label': 'DRINKS'},
   ];
 
-  final _heroCards = [
+  List<Map<String, dynamic>> get _heroCards => [
     {
-      'title': 'THE OMNIVORE\nSTACK',
-      'badge': 'FEATURED DROP',
-      'badgeColor': const Color(0xFFFF3B30),
-      'status': '● OPEN NOW',
-      'meta': 'LIMITED QTY',
-      'image':
-          'https://lh3.googleusercontent.com/aida-public/AB6AXuD4_-hFyORwJDad98D9C7-MpI6ez7dMm2XJ0jChJCJ7vmERQW8ZbzbVMO-VNpX_brGVVTZ_2Nmcp6v9q1GTVPrTwTMDkkRwTOxatbE6VYy4dcwfltFrOM1p_Hs7RU3tPL1squN0zkaD3KEk328dRQoS6MS5_a9ivCkf3EZajScXpP9RLhEZegi8NpOb9vHOYofiQZuASE23rA4DvcqVgwVPFPlciWn7feL1CYz1eIfqyHtfXAEgxXtPj3vxnO7I9gpSx9saxNO-l0h1',
-    },
-    {
-      'title': 'TOKYO\nDRIFT',
-      'badge': 'LATE NIGHT',
+      'title': 'VRINDAVAN\nSATTVIK THALI',
+      'badge': 'POOJA SPECIAL',
       'badgeColor': const Color(0xFFFF9500),
-      'status': '● FAST DELIVERY',
-      'meta': '24/7',
+      'status': '● PURE VEG',
+      'meta': 'TRADITIONAL',
       'image':
-          'https://lh3.googleusercontent.com/aida-public/AB6AXuDMv2egTH49gc_zCIUG0hw1-lBb4Bo2RKLrIUH-VqJoEko9uAecY9gMoekmqnvWDbPUBd62DTma8XL9SmehReF8LDeOAuO7wNtXzR7EnhnIp5Rz27qg2Mv8pFpsXslKejHFBMqbKrC-4s_88yC1gfjXzKKToNrkG7NO0kJJ-zDHSRx1R_iu3fQnUim80h93lUwsqnzfzDYSmXL1ePWgjyuqdKeou1aTnG7qOBFs3-rBC7_B_mQxqBg2cpWwPlKzr4vfhpgdn7YinHwV',
+          'https://images.unsplash.com/photo-1742281257687-092746ad6021?fm=jpg&q=60&w=3000&auto=format&fit=crop',
+    },
+    {
+      'title': 'KESHAV\nSWEETS',
+      'badge': 'FESTIVAL READY',
+      'badgeColor': const Color(0xFF30D158),
+      'status': '● DESI GHEE',
+      'meta': 'SINCE 1985',
+      'image':
+          'https://images.unsplash.com/photo-1666190092159-3171cf0fbb12?fm=jpg&q=60&w=3000&auto=format&fit=crop',
     },
   ];
 
-  final _restaurants = [
+  List<Map<String, dynamic>> get _restaurants => [
     {
-      'name': 'NEON RAMEN BAR',
-      'tags': ['JAPANESE', 'NOODLES', '\$\$'],
-      'time': '15m',
-      'distance': '0.8km',
-      'match': 98,
-      'badge': '🔥 HOT',
+      'name': 'RADHE RADHE DHABA',
+      'tags': ['PURE VEG', 'NORTH INDIAN', 'THALI'],
+      'time': '20m',
+      'distance': '1.5km',
+      'match': 99,
+      'badge': '🥦 BEST',
       'image':
-          'https://lh3.googleusercontent.com/aida-public/AB6AXuBncsX5meUqkGVBQRz-4e9PNBoiTQZI9qlxYNDgAphLrENSxPFAhJJIvHfJzQfNoNOwGf0gKpLnw3xF4lQSfmxZmxMVY1_Du7GZuH6Iug00SbPyoAiE5wC35ufsP_0HVjOQarTjcFVPbqGKanHRYt3I_OMsKwdQepsmfpskVFIxvh_yxQT98bcMkZycl7x7vOSm8PbKHppAiOE_THuQSL8JTiPexiatMcChk63X-n-KvTyhH5C-midNxVIxrhaaoRaRkYjvXx6CodTu',
+          'https://images.unsplash.com/photo-1742281257687-092746ad6021?fm=jpg&q=60&w=3000&auto=format&fit=crop',
     },
     {
-      'name': 'CYBER TACOS',
-      'tags': ['MEXICAN', 'SPICY', '\$'],
-      'time': '22m',
-      'distance': '1.2km',
-      'match': 85,
-      'badge': null,
+      'name': 'GOKUL CHAAT CENTER',
+      'tags': ['STREET FOOD', 'SPICY', 'PURE VEG'],
+      'time': '12m',
+      'distance': '0.5km',
+      'match': 94,
+      'badge': '🔥 TRENDING',
       'image':
-          'https://lh3.googleusercontent.com/aida-public/AB6AXuCoIjjsAY-PUGZxSVwJAnxHVKtPBCcbjAQPnk9GO95R6bI_fwJkZ2giVcUCpsKeqiF_K_ouOjH2pQXLOqzWf19-iUZO9EBSHNDAW7mF6s1rNFLfW9ZEHF1xfk18idSJLonby5CT3vUfiSASFeevTIMLLcb72B6tvEMbNwAQ3UoWrgrrHM32fS5QoRklgYtWF2Jp7Rpv-5_1d4Z0bON_6wuwd3cN42RJjBA1y58CPDTN0fLOBQl5HaGMa74QEKIzzsRMzg1nD5iSD45b',
+          'https://images.unsplash.com/photo-1666001120694-3ebe8fd207be?fm=jpg&q=60&w=3000&auto=format&fit=crop',
     },
     {
-      'name': 'GLITCH BURGER',
-      'tags': ['AMERICAN', 'COMFORT', '\$\$\$'],
-      'time': '30m',
-      'distance': '2.4km',
-      'match': 92,
-      'badge': null,
-      'image':
-          'https://lh3.googleusercontent.com/aida-public/AB6AXuATkSlRx_-Sp_sI8b_gIFvSwAwjSHpaNry4dhvporAsiQNW610GNbiIvJcTQEhjIL1TlbrdFjob-OAE-8ILx8vUhNpK5OjRyqyKpB6vP0Cds5dfoZyMBMs5CQEgB8WrY8oN17gAaLwfzgR1c92v6Ge69xiIfmGm708LxoLQF5OlfOqgk8zm5GtCqpB94OyQ1dUeQPm_ku6rJVdjV18srD5hVYt8Yax-1emyo2HCsSU5GOXncUYuhA9FgkEfQDVjJqfJ1uCeBGH3RcX_',
-    },
-    {
-      'name': 'DATA SLICE',
-      'tags': ['PIZZA', 'ITALIAN', '\$\$'],
+      'name': 'SOUTH INDIAN EXPRESS',
+      'tags': ['IDLI', 'DOSA', 'VEGAN FRIENDLY'],
       'time': '18m',
-      'distance': '1.1km',
+      'distance': '2.2km',
       'match': 88,
-      'badge': '★ 4.9',
+      'badge': null,
       'image':
-          'https://lh3.googleusercontent.com/aida-public/AB6AXuCClMzetgrTz119uXlZuO0FOPEGcUz90QdXz0skupvzpk8o8Q0oM-42jrp_JCKSD-hcuDLEMqLGvi5gjn5m3o6G_ZsLUqrGfNkBb4mT6P3Q9igCwS9DaO6n6e6-Yz9kjaJCS7WnH5UMsBqHXgE7piSNdiH9TrokoaodbbHu0qGFJaxtWUD2ILSwQiCsURrRQtV1mJBR3SXO9IJBnmlag9K5Oq2BcH9xmSiWAO4zOhQEtgxzYCwIaYGc3wCjnhbuLK0rXNcj9yAI450L',
+          'https://images.unsplash.com/photo-1668236543090-82eba5ee5976?fm=jpg&q=60&w=3000&auto=format&fit=crop',
     },
   ];
 
   @override
   Widget build(BuildContext context) {
     return Column(
+      key: UniqueKey(),
       children: [
         _buildHeader(),
         Expanded(
@@ -404,7 +395,7 @@ class _HomeContentState extends State<_HomeContent> {
       child: ClipRect(
         child: _MarqueeWidget(
           child: Text(
-            '⚡ 50% OFF BURGERS • FREE DELIVERY • SUSHI BOGO • RUSH HOUR MODE ACTIVE ⚡ ',
+            '⚡ 50% OFF THALIS • FREE DELIVERY • SWEETS BOGO • PURE VEG MODE ACTIVE ⚡ ',
             style: GoogleFonts.jetBrainsMono(
               fontSize: 11,
               fontWeight: FontWeight.w700,
@@ -478,8 +469,10 @@ class _HomeContentState extends State<_HomeContent> {
                 fit: StackFit.expand,
                 children: [
                   CachedNetworkImage(
-                    imageUrl: restaurant['image'] as String,
+                    imageUrl: restaurant['image']!,
                     fit: BoxFit.cover,
+                    width: double.infinity,
+                    height: double.infinity,
                   ),
                   if (restaurant['badge'] != null)
                     Positioned(

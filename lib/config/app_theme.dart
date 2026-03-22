@@ -13,6 +13,7 @@ class AppTheme {
   static const Color primary = Color(0xFFFF3B30); // Hyper Red
   static const Color secondary = Color(0xFFFF9500); // Yolk Orange
   static const Color success = Color(0xFF30D158); // Matrix Green
+  static const Color pureVeg = Color(0xFF00AD06); // Indian Veg Green
 
   // Text
   static const Color textPrimary = Color(0xFFFFFFFF);

@@ -35,7 +35,7 @@ class ProfileScreen extends StatelessWidget {
                       child: const CircleAvatar(
                         radius: 40,
                         backgroundImage: NetworkImage(
-                          'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=100&q=80',
+                          'https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&w=100&q=80',
                         ),
                       ),
                     ),

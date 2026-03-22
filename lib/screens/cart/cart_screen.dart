@@ -3,6 +3,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import '../../config/app_theme.dart';
 import '../../widgets/industrial_widgets.dart';
+import '../payment/payment_screen.dart';
 import '../tracking/tracking_screen.dart';
 
 class CartScreen extends StatelessWidget {
@@ -12,28 +13,25 @@ class CartScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final items = [
       {
-        'name': 'Spicy Miso Ramen',
+        'name': 'Paneer Tikka Platter',
+        'qty': 1,
+        'price': 12.00,
+        'mods': 'Well-done • Mint Chutney',
+        'image': 'https://images.unsplash.com/photo-1666001120694-3ebe8fd207be?fm=jpg&q=60&w=3000&auto=format&fit=crop',
+      },
+      {
+        'name': 'Dal Makhani',
         'qty': 2,
-        'price': 28.00,
-        'mods': 'Ex. Spicy • No Corn • Extra Egg',
-        'image':
-            'https://lh3.googleusercontent.com/aida-public/AB6AXuB-xCmhheF_L3jXa53y5tZgQ56m8UbB9JXgSs04FfKVdFq6J9f7yuL9pqFK0o6wOephtupVGd1mSWH0S3W2fPOb03KVE5PYCU-F0Nvv8gTNm9OyNTNQysPlS2N9PPukr-doYd6w6QtC5SE1WQ486bRF5PghNiFG5GyzkTpBHF6utK2xIYMNCBFyiMS0z6lqCa-CY83wKW6_RqmF8I_utOztlUX3p3Q57ExHSPOC2S0u_rry99NeEaXPIhOV7uHBlweLicGp6tbQf8H8',
+        'price': 21.00,
+        'mods': 'Extra Creamy • Less Spicy',
+        'image': 'https://images.unsplash.com/photo-1742281257687-092746ad6021?fm=jpg&q=60&w=3000&auto=format&fit=crop',
       },
       {
-        'name': 'Gyoza (5pc)',
-        'qty': 1,
-        'price': 6.50,
-        'mods': 'Pan-fried • Soy Vinegar',
-        'image':
-            'https://lh3.googleusercontent.com/aida-public/AB6AXuD6DXbl40JslWPJ2ol7tihK7vdrneWxxcOGU-5Ki_BW2cgBCBRlHYVQ7xg14siVR3L4p3ELjArBNKim7Nc6dFn3mCw0KMuShxo0y23S1sT9lJJxx-OI6y1EVHI999N_FUpm098QitVP_XL4ukOpzu1zH1tPa_SkEZ4UQ2D5mXD9n_b9KkS2FfXGROC-gPkFHoXPbEQ-v1Jsbr7io8ulV-o6XjsN3uE95JXZ_d1j_HVwoRa7o1umtb9rEXs7lJmI3AswphkK1Wr6K5k1',
-      },
-      {
-        'name': 'Asahi Super Dry',
-        'qty': 1,
-        'price': 5.00,
-        'mods': 'Chilled',
-        'image':
-            'https://lh3.googleusercontent.com/aida-public/AB6AXuBtw3RMEfBZuP7JJ_rmi840xJgx0zBVWnFbVdXM71Q1tOZw7rWJLxsDyYeI5bBrC9EAOejL8OnYEHo08CZjR92lTUDvz-XqNVMI3B2H63ElkDG6dLHVros89j3yrkIuLpK5havFZFNkpEsv-EUBwlCL8ZD-imCH2VjV08YCKHNue1ZczUGTl5ZfTFncUF9g4SDYdMbfcB2lb_T6ouV0KpSFsVf6us9_79A45m3l33moIyV7LNlbHQvFBgZRSkCEVWbZtpEQinAZ8rh8',
+        'name': 'Butter Naan',
+        'qty': 3,
+        'price': 10.50,
+        'mods': 'Garlic Topping',
+        'image': 'https://images.unsplash.com/photo-1742281257687-092746ad6021?fm=jpg&q=60&w=3000&auto=format&fit=crop',
       },
     ];
 
@@ -207,11 +205,11 @@ class CartScreen extends StatelessWidget {
                     padding: const EdgeInsets.all(16),
                     child: Column(
                       children: [
-                        _receiptRow('SUBTOTAL', '\$39.50'),
+                        _receiptRow('SUBTOTAL', '\$43.50'),
                         const SizedBox(height: 8),
-                        _receiptRow('TAX (8%)', '\$3.16'),
+                        _receiptRow('TAX (5%)', '\$2.17'),
                         const SizedBox(height: 8),
-                        _receiptRow('DELIVERY FEE', '\$2.99'),
+                        _receiptRow('DELIVERY FEE', '\$0.00'),
                         Container(
                           margin: const EdgeInsets.symmetric(vertical: 12),
                           height: 2,
@@ -236,7 +234,7 @@ class CartScreen extends StatelessWidget {
                               ),
                             ),
                             Text(
-                              '\$45.65',
+                              '\$45.67',
                               style: GoogleFonts.jetBrainsMono(
                                 fontSize: 24,
                                 fontWeight: FontWeight.w700,
@@ -368,10 +366,10 @@ class CartScreen extends StatelessWidget {
                   SlideToPayButton(
                     amount: 45.65,
                     onSlideComplete: () {
-                      Navigator.pushReplacement(
+                      Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (_) => const TrackingScreen(),
+                          builder: (_) => PaymentScreen(amount: 45.67),
                         ),
                       );
                     },

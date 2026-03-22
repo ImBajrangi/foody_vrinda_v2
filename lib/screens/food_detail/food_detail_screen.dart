@@ -3,6 +3,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import '../../config/app_theme.dart';
 import '../../widgets/industrial_widgets.dart';
+import '../../models/shop_model.dart';
 
 class FoodDetailScreen extends StatefulWidget {
   final Map<String, dynamic> item;
@@ -22,9 +23,9 @@ class _FoodDetailScreenState extends State<FoodDetailScreen> {
   double _spiceLevel = 2;
   final List<bool> _addOns = [false, true, false, false];
   final _addOnItems = [
-    {'name': 'Extra Beef', 'price': 3.00},
-    {'name': 'Fried Egg', 'price': 1.50},
-    {'name': 'Bok Choy', 'price': 1.00},
+    {'name': 'Extra Paneer', 'price': 3.00},
+    {'name': 'Fried Cheese', 'price': 1.50},
+    {'name': 'Spicy Corn', 'price': 1.00},
     {'name': 'Chili Oil Jar', 'price': 5.00},
   ];
   final _bases = [
@@ -77,7 +78,7 @@ class _FoodDetailScreenState extends State<FoodDetailScreen> {
                       children: [
                         Positioned.fill(
                           child: CachedNetworkImage(
-                            imageUrl: widget.item['image'] as String,
+                            imageUrl: ShopModel.sanitizeUrl(widget.item['image'] as String?) ?? '',
                             fit: BoxFit.cover,
                           ),
                         ),
