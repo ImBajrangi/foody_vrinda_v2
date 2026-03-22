@@ -37,10 +37,15 @@ class _AnimatedLoaderState extends State<AnimatedLoader> {
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           if (_showAnimation)
-            LottieAssets.build(
-              LottieAssets.foodLoading,
+            SizedBox(
               width: widget.size,
               height: widget.size,
+              child: RepaintBoundary(
+                child: LottieAssets.build(
+                  LottieAssets.foodLoading,
+                  fit: BoxFit.contain,
+                ),
+              ),
             ),
           if (widget.message != null && _showAnimation) ...[
             const SizedBox(height: 16),
@@ -84,10 +89,15 @@ class EmptyState extends StatelessWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            LottieAssets.build(
-              animationUrl,
+            SizedBox(
               width: 200,
               height: 200,
+              child: RepaintBoundary(
+                child: LottieAssets.build(
+                  animationUrl,
+                  fit: BoxFit.contain,
+                ),
+              ),
             ),
             const SizedBox(height: 24),
             Text(
@@ -159,11 +169,16 @@ class _SuccessAnimationOverlayState extends State<SuccessAnimationOverlay> {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            LottieAssets.build(
-              LottieAssets.orderSuccess,
+            SizedBox(
               width: 250,
               height: 250,
-              repeat: false,
+              child: RepaintBoundary(
+                child: LottieAssets.build(
+                  LottieAssets.orderSuccess,
+                  repeat: false,
+                  fit: BoxFit.contain,
+                ),
+              ),
             ),
             if (widget.message != null) ...[
               const SizedBox(height: 24),
@@ -330,12 +345,18 @@ class CelebrationOverlay extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return IgnorePointer(
-      child: LottieAssets.build(
-        LottieAssets.confetti,
-        width: double.infinity,
-        height: double.infinity,
-        fit: BoxFit.cover,
-        repeat: false,
+      child: Center(
+        child: SizedBox(
+          width: double.infinity,
+          height: double.infinity,
+          child: RepaintBoundary(
+            child: LottieAssets.build(
+              LottieAssets.confetti,
+              fit: BoxFit.cover,
+              repeat: false,
+            ),
+          ),
+        ),
       ),
     );
   }

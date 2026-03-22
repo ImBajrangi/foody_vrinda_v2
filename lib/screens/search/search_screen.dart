@@ -218,7 +218,13 @@ class _SearchScreenState extends State<SearchScreen> {
         child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            SizedBox(height: 20, width: 20, child: LottieAssets.build(lottie)),
+            SizedBox(
+              height: 20,
+              width: 20,
+              child: RepaintBoundary(
+                child: LottieAssets.build(lottie),
+              ),
+            ),
             const SizedBox(width: 8),
             Text(
               label,

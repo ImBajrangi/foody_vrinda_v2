@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import '../models/order_model.dart';
 import '../models/cart_item_model.dart';
@@ -29,6 +30,10 @@ class OrderService {
       debugPrint('OrderService: Creating order for shop $shopId');
       debugPrint('OrderService: Customer: $customerName, Phone: $customerPhone');
       debugPrint('OrderService: Items count: ${cartItems.length}');
+
+      if (cartItems.isEmpty) {
+        debugPrint('OrderService: WARNING - cartItems is empty');
+      }
 
       final items = cartItems
           .map(
@@ -86,8 +91,16 @@ class OrderService {
         'updatedAt': FieldValue.serverTimestamp(),
       };
 
-      debugPrint('OrderService: Saving order to Firestore...');
-      final docRef = await _firestore.collection('orders').add(orderData);
+      debugPrint('OrderService: Attempting Firestore write for orders collection...');
+      
+      // Use a timeout to avoid infinite hang if Firestore is unreachable
+      final docRef = await _firestore.collection('orders').add(orderData).timeout(
+        const Duration(seconds: 15),
+        onTimeout: () {
+          debugPrint('OrderService: Firestore write TIMED OUT after 15s');
+          throw TimeoutException('Firestore write timed out. Check connection or rules.');
+        },
+      );
 
       debugPrint('OrderService: Order created successfully with ID: ${docRef.id}');
       return docRef.id;

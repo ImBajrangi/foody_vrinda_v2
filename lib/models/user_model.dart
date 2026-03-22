@@ -188,7 +188,8 @@ class UserModel {
   bool get isStaff =>
       role == UserRole.kitchen ||
       role == UserRole.delivery ||
-      role == UserRole.owner;
+      role == UserRole.owner ||
+      role == UserRole.developer;
   bool get isAdmin => role == UserRole.owner || role == UserRole.developer;
   bool get isDeveloper => role == UserRole.developer;
 

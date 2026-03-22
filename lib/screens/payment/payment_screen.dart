@@ -11,6 +11,7 @@ import '../../services/auth_service.dart';
 import '../../services/live_simulation_service.dart';
 import '../../providers/cart_provider.dart';
 import '../../providers/auth_provider.dart';
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'order_success_screen.dart';
 
 class PaymentScreen extends StatefulWidget {
@@ -41,15 +42,19 @@ class _PaymentScreenState extends State<PaymentScreen> {
   @override
   void initState() {
     super.initState();
-    _razorpay = Razorpay();
-    _razorpay.on(Razorpay.EVENT_PAYMENT_SUCCESS, _handlePaymentSuccess);
-    _razorpay.on(Razorpay.EVENT_PAYMENT_ERROR, _handlePaymentError);
-    _razorpay.on(Razorpay.EVENT_EXTERNAL_WALLET, _handleExternalWallet);
+    if (!kIsWeb) {
+      _razorpay = Razorpay();
+      _razorpay.on(Razorpay.EVENT_PAYMENT_SUCCESS, _handlePaymentSuccess);
+      _razorpay.on(Razorpay.EVENT_PAYMENT_ERROR, _handlePaymentError);
+      _razorpay.on(Razorpay.EVENT_EXTERNAL_WALLET, _handleExternalWallet);
+    }
   }
 
   @override
   void dispose() {
-    _razorpay.clear();
+    if (!kIsWeb) {
+      _razorpay.clear();
+    }
     super.dispose();
   }
 
@@ -76,6 +81,14 @@ class _PaymentScreenState extends State<PaymentScreen> {
       return;
     }
 
+    if (kIsWeb) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('ONLINE PAYMENT NOT SUPPORTED ON WEB. USE COD.')),
+      );
+      setState(() => _isProcessing = false);
+      return;
+    }
+
     final auth = context.read<AuthProvider>();
     
     var options = {
@@ -85,7 +98,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
       'description': 'PURE VEG SATTVIK MEAL',
       'prefill': {
         'contact': widget.customerPhone,
-        'email': auth.user?.email ?? 'customer@example.com',
+        'email': auth.userData?.email ?? 'customer@example.com',
         'name': widget.customerName,
       },
       'theme': {'color': '#FF3B30'},
@@ -95,6 +108,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
     };
 
     try {
+      debugPrint('PaymentScreen: Opening Razorpay...');
       _razorpay.open(options);
     } catch (e) {
       debugPrint('Razorpay Open Error: $e');
