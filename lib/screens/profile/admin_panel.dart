@@ -77,10 +77,11 @@ class _AdminPanelState extends State<AdminPanel> with SingleTickerProviderStateM
           itemCount: shops.length,
           itemBuilder: (context, index) {
             final shop = shops[index];
-            return HardShadowCard(
-              margin: const EdgeInsets.only(bottom: 16),
-              padding: const EdgeInsets.all(16),
-              child: Row(
+            return Padding(
+              padding: const EdgeInsets.only(bottom: 16),
+              child: HardShadowCard(
+                padding: const EdgeInsets.all(16),
+                child: Row(
                 children: [
                   Expanded(
                     child: Column(
@@ -111,7 +112,8 @@ class _AdminPanelState extends State<AdminPanel> with SingleTickerProviderStateM
                   ),
                 ],
               ),
-            );
+            ),
+          );
           },
         );
       },
@@ -130,10 +132,11 @@ class _AdminPanelState extends State<AdminPanel> with SingleTickerProviderStateM
           itemCount: users.length,
           itemBuilder: (context, index) {
             final user = users[index];
-            return HardShadowCard(
-              margin: const EdgeInsets.only(bottom: 16),
-              padding: const EdgeInsets.all(12),
-              child: ListTile(
+            return Padding(
+              padding: const EdgeInsets.only(bottom: 16),
+              child: HardShadowCard(
+                padding: const EdgeInsets.all(12),
+                child: ListTile(
                 title: Text(
                   user.displayName?.toUpperCase() ?? 'UNKNOWN_USER',
                   style: GoogleFonts.jetBrainsMono(fontWeight: FontWeight.w900, color: Colors.white),
@@ -142,7 +145,8 @@ class _AdminPanelState extends State<AdminPanel> with SingleTickerProviderStateM
                 trailing: const Icon(Icons.more_vert, color: AppTheme.primary),
                 onTap: () => _showUserRoleDialog(user),
               ),
-            );
+            ),
+          );
           },
         );
       },

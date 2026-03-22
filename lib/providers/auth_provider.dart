@@ -278,6 +278,26 @@ class AuthProvider extends ChangeNotifier {
     notifyListeners();
   }
 
+  /// Update user data in Firestore and local state
+  Future<void> updateUserData(Map<String, dynamic> data) async {
+    if (_user == null) return;
+    try {
+      await _firestore.collection('users').doc(_user!.uid).update(data);
+      if (_userData != null) {
+        // Update local state by re-fetching or manual merge
+        // For simplicity and correctness, let's re-fetch
+        _userData = await _authService.getUserData(_user!.uid);
+        if (_userData != null) {
+          await _saveUserDataToCache(_userData!);
+        }
+        notifyListeners();
+      }
+    } catch (e) {
+      debugPrint('AuthProvider: Error updating user data: $e');
+      rethrow;
+    }
+  }
+
   Future<void> refreshUserData() async {
     if (_user != null) {
       if (AppConfig.isDeveloperEmail(_user!.email)) {

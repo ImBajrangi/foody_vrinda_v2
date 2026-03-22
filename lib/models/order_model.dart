@@ -160,11 +160,6 @@ class OrderModel {
   final double? customerLongitude;
   final DateTime? createdAt;
   final DateTime? updatedAt;
-  final bool isUnreachable;
-  final double? customerLatitude;
-  final double? customerLongitude;
-  final DateTime? createdAt;
-  final DateTime? updatedAt;
 
   OrderModel({
     required this.id,
