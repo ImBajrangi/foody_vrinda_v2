@@ -10,7 +10,7 @@ import '../../providers/cart_provider.dart';
 
 class FoodDetailScreen extends StatefulWidget {
   final Map<String, dynamic> item;
-  final VoidCallback onAddToCart;
+  final Function(int quantity) onAddToCart;
   const FoodDetailScreen({
     super.key,
     required this.item,
@@ -508,26 +508,10 @@ class _FoodDetailScreenState extends State<FoodDetailScreen> {
                   ),
                 ],
               ),
-              onPressed: () {
-                final cart = context.read<CartProvider>();
-                
-                // Create MenuItemModel from Map
-                final menuItem = MenuItemModel.fromMap({
-                  'id': widget.item['id'] ?? widget.item['name'],
-                  'name': widget.item['name'],
-                  'price': (widget.item['price'] as num).toDouble(),
-                  'image': widget.item['image'],
-                  'shopId': widget.item['shopId'] ?? 'demo_shop',
-                });
-
-                // Add to cart with quantity
-                for (int i = 0; i < _quantity; i++) {
-                  cart.addToCart(menuItem);
-                }
-
-                widget.onAddToCart();
-                Navigator.pop(context);
-              },
+                onPressed: () {
+                  widget.onAddToCart(_quantity);
+                  Navigator.pop(context);
+                },
             ),
           ],
         ),

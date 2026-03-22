@@ -22,14 +22,22 @@ class CartProvider with ChangeNotifier {
       final cartJson = prefs.getString('cached_cart');
       if (cartJson != null) {
         final List<dynamic> decoded = jsonDecode(cartJson);
-        _items = decoded.map((item) {
-          // This assumes MenuItemModel has a fromMap/toJson
-          // We'll need to ensure MenuItemModel is robust
+        final loadedItems = decoded.map((item) {
           return CartItemModel(
             menuItem: MenuItemModel.fromMap(item['menuItem']),
             quantity: item['quantity'],
           );
         }).toList();
+
+        // Merge loaded items with any items added before initialization
+        for (var loadedItem in loadedItems) {
+          final index = _items.indexWhere((i) => i.menuItem.id == loadedItem.menuItem.id);
+          if (index != -1) {
+            _items[index].quantity += loadedItem.quantity;
+          } else {
+            _items.add(loadedItem);
+          }
+        }
       }
     } catch (e) {
       debugPrint('CartProvider: Error loading cart: $e');
@@ -40,6 +48,7 @@ class CartProvider with ChangeNotifier {
   }
 
   Future<void> _saveCart() async {
+    if (!_isInitialized) return;
     try {
       final prefs = await SharedPreferences.getInstance();
       final cartJson = jsonEncode(_items.map((item) => {
@@ -52,12 +61,12 @@ class CartProvider with ChangeNotifier {
     }
   }
 
-  void addToCart(MenuItemModel item) {
+  void addToCart(MenuItemModel item, {int quantity = 1}) {
     final index = _items.indexWhere((cartItem) => cartItem.menuItem.id == item.id);
     if (index != -1) {
-      _items[index].quantity++;
+      _items[index].quantity += quantity;
     } else {
-      _items.add(CartItemModel(menuItem: item));
+      _items.add(CartItemModel(menuItem: item, quantity: quantity));
     }
     _saveCart();
     notifyListeners();

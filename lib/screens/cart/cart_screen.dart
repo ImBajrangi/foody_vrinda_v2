@@ -173,11 +173,11 @@ class CartScreen extends StatelessWidget {
                     padding: const EdgeInsets.all(16),
                     child: Column(
                       children: [
-                        _receiptRow('SUBTOTAL', '\$${subtotal.toStringAsFixed(2)}'),
+                        _receiptRow('SUBTOTAL', '₹${subtotal.toStringAsFixed(0)}'),
                         const SizedBox(height: 8),
-                        _receiptRow('DELIVERY FEE', '\$${deliveryFee.toStringAsFixed(2)}'),
+                        _receiptRow('DELIVERY FEE', '₹${deliveryFee.toStringAsFixed(0)}'),
                         const SizedBox(height: 8),
-                        _receiptRow('TAX & FEES', '\$${tax.toStringAsFixed(2)}'),
+                        _receiptRow('TAX & FEES', '₹${tax.toStringAsFixed(0)}'),
                         const SizedBox(height: 16),
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -191,7 +191,7 @@ class CartScreen extends StatelessWidget {
                               ),
                             ),
                             Text(
-                              '\$${total.toStringAsFixed(2)}',
+                              '₹${total.toStringAsFixed(0)}',
                               style: GoogleFonts.spaceGrotesk(
                                 fontSize: 18,
                                 fontWeight: FontWeight.w800,

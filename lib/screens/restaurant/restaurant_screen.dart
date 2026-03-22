@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:provider/provider.dart';
 import '../../config/app_theme.dart';
 import '../../widgets/industrial_widgets.dart';
 import '../food_detail/food_detail_screen.dart';
 import '../cart/cart_screen.dart';
+import '../../providers/cart_provider.dart';
+import '../../models/menu_item_model.dart';
 
 class RestaurantScreen extends StatefulWidget {
   const RestaurantScreen({super.key});
@@ -14,8 +17,6 @@ class RestaurantScreen extends StatefulWidget {
 
 class _RestaurantScreenState extends State<RestaurantScreen> {
   int _selectedTab = 0;
-  int _cartCount = 0;
-  double _cartTotal = 0;
   final _tabs = ['Signature', 'Thalis', 'Starters', 'Sides', 'Sweets'];
 
   List<Map<String, dynamic>> get _menuItems => [
@@ -56,17 +57,24 @@ class _RestaurantScreenState extends State<RestaurantScreen> {
     },
   ];
 
-  void _addToCart(Map<String, dynamic> item) {
-    setState(() {
-      _cartCount++;
-      _cartTotal += (item['price'] as double);
+  void _addToCart(Map<String, dynamic> item, {int quantity = 1}) {
+    final cart = context.read<CartProvider>();
+    final menuItem = MenuItemModel.fromMap({
+      'id': item['id'] ?? item['name'],
+      'name': item['name'],
+      'price': (item['price'] as num).toDouble(),
+      'image': item['image'],
+      'shopId': item['shopId'] ?? 'demo_shop',
     });
+    cart.addToCart(menuItem, quantity: quantity);
   }
 
   @override
   Widget build(BuildContext context) {
+    final cart = context.watch<CartProvider>();
+    final cartCount = cart.items.length;
+    
     return Scaffold(
-      key: UniqueKey(), // Force rebuild
       backgroundColor: AppTheme.background,
       body: Stack(
         children: [
@@ -82,7 +90,7 @@ class _RestaurantScreenState extends State<RestaurantScreen> {
               const SliverToBoxAdapter(child: SizedBox(height: 100)),
             ],
           ),
-          if (_cartCount > 0) _buildCartBar(),
+          if (cartCount > 0) _buildCartBar(cart),
         ],
       ),
     );
@@ -343,7 +351,7 @@ class _RestaurantScreenState extends State<RestaurantScreen> {
         isScrollControlled: true,
         backgroundColor: Colors.transparent,
         builder: (_) =>
-            FoodDetailScreen(item: item, onAddToCart: () => _addToCart(item)),
+            FoodDetailScreen(item: item, onAddToCart: (qty) => _addToCart(item, quantity: qty)),
       ),
       child: Container(
         padding: const EdgeInsets.symmetric(vertical: 16),
@@ -468,7 +476,7 @@ class _RestaurantScreenState extends State<RestaurantScreen> {
     );
   }
 
-  Widget _buildCartBar() {
+  Widget _buildCartBar(CartProvider cart) {
     return Positioned(
       bottom: 16,
       left: 16,
@@ -502,7 +510,7 @@ class _RestaurantScreenState extends State<RestaurantScreen> {
                     ),
                     child: Center(
                       child: Text(
-                        '$_cartCount',
+                        '${cart.items.length}',
                         style: GoogleFonts.spaceGrotesk(
                           fontSize: 11,
                           fontWeight: FontWeight.w700,
@@ -513,7 +521,7 @@ class _RestaurantScreenState extends State<RestaurantScreen> {
                   ),
                   const SizedBox(width: 8),
                   Text(
-                    '\$${_cartTotal.toStringAsFixed(2)}',
+                    '₹${cart.total.toStringAsFixed(0)}',
                     style: GoogleFonts.jetBrainsMono(
                       fontSize: 14,
                       color: Colors.white,
