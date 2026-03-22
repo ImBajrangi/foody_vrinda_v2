@@ -1,39 +1,24 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:provider/provider.dart';
 import '../../config/app_theme.dart';
 import '../../widgets/industrial_widgets.dart';
+import '../../providers/cart_provider.dart';
 import '../payment/payment_screen.dart';
-import '../tracking/tracking_screen.dart';
 
 class CartScreen extends StatelessWidget {
   const CartScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
-    final items = [
-      {
-        'name': 'Paneer Tikka Platter',
-        'qty': 1,
-        'price': 12.00,
-        'mods': 'Well-done • Mint Chutney',
-        'image': 'https://images.unsplash.com/photo-1666001120694-3ebe8fd207be?fm=jpg&q=60&w=3000&auto=format&fit=crop',
-      },
-      {
-        'name': 'Dal Makhani',
-        'qty': 2,
-        'price': 21.00,
-        'mods': 'Extra Creamy • Less Spicy',
-        'image': 'https://images.unsplash.com/photo-1742281257687-092746ad6021?fm=jpg&q=60&w=3000&auto=format&fit=crop',
-      },
-      {
-        'name': 'Butter Naan',
-        'qty': 3,
-        'price': 10.50,
-        'mods': 'Garlic Topping',
-        'image': 'https://images.unsplash.com/photo-1742281257687-092746ad6021?fm=jpg&q=60&w=3000&auto=format&fit=crop',
-      },
-    ];
+    final cart = context.watch<CartProvider>();
+    final items = cart.items;
+
+    final subtotal = cart.subtotal;
+    final deliveryFee = cart.deliveryFee;
+    final tax = cart.tax;
+    final total = cart.total;
 
     return Scaffold(
       backgroundColor: AppTheme.background,
@@ -76,6 +61,28 @@ class CartScreen extends StatelessWidget {
                 ],
               ),
             ),
+            // Empty State
+            if (items.isEmpty)
+              Expanded(
+                child: Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      const Icon(Icons.shopping_bag_outlined, size: 64, color: AppTheme.textSecondary),
+                      const SizedBox(height: 16),
+                      Text(
+                        'YOUR CART IS EMPTY',
+                        style: GoogleFonts.spaceGrotesk(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w700,
+                          color: AppTheme.textSecondary,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              )
+            else
             // Scrollable
             Expanded(
               child: ListView(
@@ -84,8 +91,9 @@ class CartScreen extends StatelessWidget {
                   // Items Card
                   HardShadowCard(
                     child: Column(
-                      children: items.map((item) {
-                        final isLast = items.indexOf(item) == items.length - 1;
+                      children: items.map((cartItem) {
+                        final item = cartItem.menuItem;
+                        final isLast = items.indexOf(cartItem) == items.length - 1;
                         return Container(
                           padding: const EdgeInsets.all(12),
                           decoration: BoxDecoration(
@@ -99,54 +107,18 @@ class CartScreen extends StatelessWidget {
                           ),
                           child: Row(
                             children: [
-                              SizedBox(
-                                width: 64,
-                                height: 64,
-                                child: Stack(
-                                  clipBehavior: Clip.none,
-                                  children: [
-                                    Container(
-                                      decoration: BoxDecoration(
-                                        borderRadius: BorderRadius.circular(4),
-                                        border: Border.all(
-                                          color: AppTheme.borderDark,
-                                        ),
-                                      ),
-                                      clipBehavior: Clip.antiAlias,
-                                      child: CachedNetworkImage(
-                                        imageUrl: item['image'] as String,
-                                        fit: BoxFit.cover,
-                                        width: 64,
-                                        height: 64,
-                                      ),
-                                    ),
-                                    Positioned(
-                                      top: -4,
-                                      right: -4,
-                                      child: Container(
-                                        padding: const EdgeInsets.symmetric(
-                                          horizontal: 4,
-                                          vertical: 2,
-                                        ),
-                                        decoration: BoxDecoration(
-                                          color: (item['qty'] as int) > 1
-                                              ? AppTheme.primary
-                                              : AppTheme.surface,
-                                          border: Border.all(
-                                            color: AppTheme.borderDark,
-                                          ),
-                                        ),
-                                        child: Text(
-                                          '${item['qty']}x',
-                                          style: GoogleFonts.jetBrainsMono(
-                                            fontSize: 10,
-                                            fontWeight: FontWeight.w700,
-                                            color: Colors.white,
-                                          ),
-                                        ),
-                                      ),
-                                    ),
-                                  ],
+                              Container(
+                                width: 50,
+                                height: 50,
+                                decoration: BoxDecoration(
+                                  border: Border.all(color: AppTheme.borderDark),
+                                  borderRadius: BorderRadius.circular(4),
+                                ),
+                                clipBehavior: Clip.antiAlias,
+                                child: CachedNetworkImage(
+                                  imageUrl: item.imageUrl ?? '',
+                                  fit: BoxFit.cover,
+                                  errorWidget: (context, url, error) => Container(color: AppTheme.surface),
                                 ),
                               ),
                               const SizedBox(width: 12),
@@ -154,44 +126,40 @@ class CartScreen extends StatelessWidget {
                                 child: Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
-                                    Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.spaceBetween,
-                                      children: [
-                                        Expanded(
-                                          child: Text(
-                                            (item['name'] as String)
-                                                .toUpperCase(),
-                                            style: GoogleFonts.spaceGrotesk(
-                                              fontSize: 13,
-                                              fontWeight: FontWeight.w700,
-                                              color: Colors.white,
-                                            ),
-                                            overflow: TextOverflow.ellipsis,
-                                          ),
-                                        ),
-                                        Text(
-                                          '\$${(item['price'] as double).toStringAsFixed(2)}',
-                                          style: GoogleFonts.jetBrainsMono(
-                                            fontSize: 13,
-                                            color: (item['qty'] as int) > 1
-                                                ? AppTheme.primary
-                                                : Colors.white,
-                                          ),
-                                        ),
-                                      ],
+                                    Text(
+                                      item.name.toUpperCase(),
+                                      style: GoogleFonts.spaceGrotesk(
+                                        fontSize: 14,
+                                        fontWeight: FontWeight.w700,
+                                        color: Colors.white,
+                                      ),
                                     ),
                                     const SizedBox(height: 4),
                                     Text(
-                                      item['mods'] as String,
+                                      '\$${item.price.toStringAsFixed(2)} x ${cartItem.quantity}',
                                       style: GoogleFonts.jetBrainsMono(
                                         fontSize: 11,
                                         color: AppTheme.textSecondary,
                                       ),
-                                      overflow: TextOverflow.ellipsis,
                                     ),
                                   ],
                                 ),
+                              ),
+                              Row(
+                                children: [
+                                  _qtyBtn(Icons.remove, () => cart.updateQuantity(item.id, cartItem.quantity - 1)),
+                                  const SizedBox(width: 12),
+                                  Text(
+                                    '${cartItem.quantity}',
+                                    style: GoogleFonts.jetBrainsMono(
+                                      fontSize: 14,
+                                      fontWeight: FontWeight.w700,
+                                      color: AppTheme.primary,
+                                    ),
+                                  ),
+                                  const SizedBox(width: 12),
+                                  _qtyBtn(Icons.add, () => cart.addToCart(item)),
+                                ],
                               ),
                             ],
                           ),
@@ -205,39 +173,28 @@ class CartScreen extends StatelessWidget {
                     padding: const EdgeInsets.all(16),
                     child: Column(
                       children: [
-                        _receiptRow('SUBTOTAL', '\$43.50'),
+                        _receiptRow('SUBTOTAL', '\$${subtotal.toStringAsFixed(2)}'),
                         const SizedBox(height: 8),
-                        _receiptRow('TAX (5%)', '\$2.17'),
+                        _receiptRow('DELIVERY FEE', '\$${deliveryFee.toStringAsFixed(2)}'),
                         const SizedBox(height: 8),
-                        _receiptRow('DELIVERY FEE', '\$0.00'),
-                        Container(
-                          margin: const EdgeInsets.symmetric(vertical: 12),
-                          height: 2,
-                          decoration: const BoxDecoration(
-                            border: Border(
-                              bottom: BorderSide(
-                                color: AppTheme.borderDark,
-                                style: BorderStyle.solid,
-                              ),
-                            ),
-                          ),
-                        ),
+                        _receiptRow('TAX & FEES', '\$${tax.toStringAsFixed(2)}'),
+                        const SizedBox(height: 16),
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
                             Text(
                               'TOTAL',
                               style: GoogleFonts.spaceGrotesk(
-                                fontSize: 14,
-                                fontWeight: FontWeight.w700,
-                                color: AppTheme.textSecondary,
+                                fontSize: 18,
+                                fontWeight: FontWeight.w800,
+                                color: Colors.white,
                               ),
                             ),
                             Text(
-                              '\$45.67',
-                              style: GoogleFonts.jetBrainsMono(
-                                fontSize: 24,
-                                fontWeight: FontWeight.w700,
+                              '\$${total.toStringAsFixed(2)}',
+                              style: GoogleFonts.spaceGrotesk(
+                                fontSize: 18,
+                                fontWeight: FontWeight.w800,
                                 color: AppTheme.primary,
                               ),
                             ),
@@ -247,7 +204,7 @@ class CartScreen extends StatelessWidget {
                     ),
                   ),
                   const SizedBox(height: 16),
-                  // Payment
+                  // Payment Info (Static for now)
                   Container(
                     padding: const EdgeInsets.all(12),
                     decoration: BoxDecoration(
@@ -268,11 +225,7 @@ class CartScreen extends StatelessWidget {
                                 borderRadius: BorderRadius.circular(4),
                                 border: Border.all(color: AppTheme.borderDark),
                               ),
-                              child: const Icon(
-                                Icons.credit_card,
-                                color: Colors.white,
-                                size: 16,
-                              ),
+                              child: const Icon(Icons.credit_card, color: Colors.white, size: 16),
                             ),
                             const SizedBox(width: 12),
                             Column(
@@ -302,83 +255,22 @@ class CartScreen extends StatelessWidget {
                       ],
                     ),
                   ),
-                  const SizedBox(height: 16),
-                  // Promo
-                  Row(
-                    children: [
-                      Expanded(
-                        child: Container(
-                          height: 44,
-                          padding: const EdgeInsets.symmetric(horizontal: 12),
-                          decoration: BoxDecoration(
-                            color: AppTheme.background,
-                            borderRadius: BorderRadius.circular(4),
-                            border: Border.all(color: AppTheme.borderDark),
-                          ),
-                          alignment: Alignment.centerLeft,
-                          child: Text(
-                            'ENTER_PROMO_CODE',
-                            style: GoogleFonts.jetBrainsMono(
-                              fontSize: 11,
-                              color: Colors.grey[700],
-                            ),
-                          ),
-                        ),
-                      ),
-                      const SizedBox(width: 8),
-                      Container(
-                        height: 44,
-                        padding: const EdgeInsets.symmetric(horizontal: 16),
-                        decoration: BoxDecoration(
-                          color: AppTheme.primary,
-                          borderRadius: BorderRadius.circular(4),
-                          border: Border.all(color: AppTheme.borderDark),
-                          boxShadow: const [AppTheme.hardShadow],
-                        ),
-                        alignment: Alignment.center,
-                        child: Text(
-                          'ADD MORE',
-                          style: GoogleFonts.spaceGrotesk(
-                            fontSize: 12,
-                            fontWeight: FontWeight.w700,
-                            color: Colors.white,
-                            letterSpacing: 0.5,
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 24),
+                  const SizedBox(height: 32),
                 ],
               ),
             ),
-            // Slide to Pay
-            Container(
-              padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
-              decoration: BoxDecoration(
-                color: AppTheme.surface.withValues(alpha: 0.9),
-                border: const Border(
-                  top: BorderSide(color: AppTheme.borderDark),
+            // Checkout Button
+            if (items.isNotEmpty)
+              Padding(
+                padding: const EdgeInsets.all(20),
+                child: PrimaryButton(
+                  label: 'PROCEED TO CHECKOUT',
+                  onPressed: () => Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (_) => PaymentScreen(amount: cart.total)),
+                  ),
                 ),
               ),
-              child: Column(
-                children: [
-                  SlideToPayButton(
-                    amount: 45.65,
-                    onSlideComplete: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (_) => PaymentScreen(amount: 45.67),
-                        ),
-                      );
-                    },
-                  ),
-                  const SizedBox(height: 12),
-                  const MonoLabel('SECURED BY TURBO_PAY™ // 256-BIT'),
-                ],
-              ),
-            ),
           ],
         ),
       ),
@@ -401,4 +293,19 @@ class CartScreen extends StatelessWidget {
       ),
     ],
   );
+
+  Widget _qtyBtn(IconData icon, VoidCallback onTap) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        padding: const EdgeInsets.all(4),
+        decoration: BoxDecoration(
+          color: AppTheme.surface,
+          borderRadius: BorderRadius.circular(4),
+          border: Border.all(color: AppTheme.borderDark),
+        ),
+        child: Icon(icon, color: Colors.white, size: 16),
+      ),
+    );
+  }
 }

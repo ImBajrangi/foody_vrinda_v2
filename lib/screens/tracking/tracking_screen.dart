@@ -1,14 +1,111 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:provider/provider.dart';
 import '../../config/app_theme.dart';
 import '../../widgets/industrial_widgets.dart';
+import '../../services/order_service.dart';
+import '../../models/order_model.dart';
 
-class TrackingScreen extends StatelessWidget {
-  const TrackingScreen({super.key});
+class TrackingScreen extends StatefulWidget {
+  final String? orderId;
+  const TrackingScreen({super.key, this.orderId});
+
+  @override
+  State<TrackingScreen> createState() => _TrackingScreenState();
+}
+
+class _TrackingScreenState extends State<TrackingScreen> with SingleTickerProviderStateMixin {
+  late AnimationController _controller;
+  late Animation<double> _animation;
+
+  // Define the route points as normalized coordinates (0.0 to 1.0)
+  final List<Offset> _routePoints = [
+    const Offset(0.3, 0.75), // Start
+    const Offset(0.4, 0.55),
+    const Offset(0.6, 0.5),
+    const Offset(0.55, 0.25), // End
+  ];
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = AnimationController(
+      duration: const Duration(seconds: 15),
+      vsync: this,
+    )..forward();
+    
+    _animation = CurvedAnimation(
+      parent: _controller,
+      curve: Curves.easeInOutQuad,
+    );
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  Offset _getPositionAt(double progress) {
+    if (_routePoints.isEmpty) return Offset.zero;
+    if (progress <= 0) return _routePoints.first;
+    if (progress >= 1) return _routePoints.last;
+
+    final totalSegments = _routePoints.length - 1;
+    final segmentDecimal = progress * totalSegments;
+    final index = segmentDecimal.floor();
+    final segmentProgress = segmentDecimal - index;
+
+    final start = _routePoints[index];
+    final end = _routePoints[index + 1];
+
+    return Offset(
+      start.dx + (end.dx - start.dx) * segmentProgress,
+      start.dy + (end.dy - start.dy) * segmentProgress,
+    );
+  }
+
+  double _getTargetProgress(OrderStatus? status) {
+    if (status == null) return 0.0;
+    switch (status) {
+      case OrderStatus.newOrder: return 0.0;
+      case OrderStatus.preparing: return 0.25;
+      case OrderStatus.readyForPickup: return 0.5;
+      case OrderStatus.outForDelivery: return 0.75;
+      case OrderStatus.completed: return 1.0;
+      default: return 0.0;
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
+    final orderService = context.read<OrderService>();
+    final stream = widget.orderId != null 
+        ? orderService.orderStream(widget.orderId!) 
+        : null;
+
+    if (stream == null) return _buildScaffold(context, 0.5, null);
+
+    return StreamBuilder<OrderModel?>(
+      stream: stream,
+      builder: (context, snapshot) {
+        final order = snapshot.data;
+        final targetProgress = _getTargetProgress(order?.status);
+        
+        // Smoothly animate to the new target progress
+        _controller.animateTo(
+          targetProgress,
+          duration: const Duration(seconds: 3),
+          curve: Curves.easeInOut,
+        );
+
+        return _buildScaffold(context, _animation.value, order);
+      },
+    );
+  }
+
+  Widget _buildScaffold(BuildContext context, double currentProgress, OrderModel? order) {
     return Scaffold(
       backgroundColor: AppTheme.background,
       body: Column(
@@ -16,152 +113,174 @@ class TrackingScreen extends StatelessWidget {
           // Map Area (60%)
           Expanded(
             flex: 6,
-            child: Stack(
-              children: [
-                // Grid pattern background
-                Container(
-                  color: const Color(0xFF111111),
-                  child: CustomPaint(
-                    size: Size.infinite,
-                    painter: _GridPainter(),
-                  ),
-                ),
-                // Route line
-                CustomPaint(size: Size.infinite, painter: _RoutePainter()),
-                // Destination marker
-                Positioned(
-                  top: 130,
-                  left: MediaQuery.of(context).size.width * 0.55,
-                  child: _pulseDot(),
-                ),
-                // Rider marker
-                Positioned(
-                  top: 280,
-                  left: MediaQuery.of(context).size.width * 0.35,
-                  child: Column(
-                    children: [
-                      CustomPaint(
-                        size: const Size(20, 20),
-                        painter: _ArrowPainter(),
+            child: AnimatedBuilder(
+              animation: _animation,
+              builder: (context, child) {
+                final riderPos = _getPositionAt(currentProgress);
+                final destPos = _routePoints.last;
+                
+                return Stack(
+                  children: [
+                    // Grid pattern background
+                    Container(
+                      color: const Color(0xFF111111),
+                      child: CustomPaint(
+                        size: Size.infinite,
+                        painter: _GridPainter(),
                       ),
-                      const SizedBox(height: 4),
-                      Container(
-                        width: 32,
-                        height: 32,
+                    ),
+                    // Route line
+                    CustomPaint(
+                      size: Size.infinite, 
+                      painter: _RoutePainter(
+                        points: _routePoints,
+                        progress: currentProgress,
+                      )
+                    ),
+                    // Destination marker
+                    Positioned(
+                      top: MediaQuery.of(context).size.height * 0.6 * destPos.dy,
+                      left: MediaQuery.of(context).size.width * destPos.dx,
+                      child: _pulseDot(),
+                    ),
+                    // Rider marker
+                    Positioned(
+                      top: MediaQuery.of(context).size.height * 0.6 * riderPos.dy,
+                      left: MediaQuery.of(context).size.width * riderPos.dx,
+                      child: FractionalTranslation(
+                        translation: const Offset(-0.5, -0.5),
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            CustomPaint(
+                              size: const Size(20, 20),
+                              painter: _ArrowPainter(),
+                            ),
+                            const SizedBox(height: 4),
+                            Container(
+                              width: 32,
+                              height: 32,
+                              decoration: BoxDecoration(
+                                shape: BoxShape.circle,
+                                border: Border.all(color: Colors.white, width: 2),
+                                boxShadow: const [AppTheme.hardShadow],
+                              ),
+                              clipBehavior: Clip.antiAlias,
+                              child: CachedNetworkImage(
+                                imageUrl: 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&w=100&q=80',
+                                fit: BoxFit.cover,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                    // Alert
+                    Positioned(
+                      top: MediaQuery.of(context).padding.top + 60,
+                      left: 16,
+                      right: 16,
+                      child: Container(
+                        padding: const EdgeInsets.all(12),
                         decoration: BoxDecoration(
-                          shape: BoxShape.circle,
-                          border: Border.all(color: Colors.white, width: 2),
+                          color: AppTheme.surface.withValues(alpha: 0.9),
+                          borderRadius: BorderRadius.circular(4),
+                          border: Border.all(color: AppTheme.borderDark),
                           boxShadow: const [AppTheme.hardShadow],
                         ),
-                        clipBehavior: Clip.antiAlias,
-                        child: CachedNetworkImage(
-                          imageUrl: 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&w=100&q=80',
-                          fit: BoxFit.cover,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                // Alert
-                Positioned(
-                  top: MediaQuery.of(context).padding.top + 60,
-                  left: 16,
-                  right: 16,
-                  child: Container(
-                    padding: const EdgeInsets.all(12),
-                    decoration: BoxDecoration(
-                      color: AppTheme.surface.withValues(alpha: 0.9),
-                      borderRadius: BorderRadius.circular(4),
-                      border: Border.all(color: AppTheme.borderDark),
-                      boxShadow: const [AppTheme.hardShadow],
-                    ),
-                    child: Row(
-                      children: [
-                        const Icon(
-                          Icons.warning_amber,
-                          color: AppTheme.primary,
-                          size: 22,
-                        ),
-                        const SizedBox(width: 12),
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              const MonoLabel('Live Status'),
-                              const SizedBox(height: 2),
-                              Text(
-                                'Rider stopped at light (2m)',
-                                style: GoogleFonts.spaceGrotesk(
-                                  fontSize: 14,
-                                  fontWeight: FontWeight.w700,
-                                  color: Colors.white,
-                                ),
+                        child: Row(
+                          children: [
+                            const Icon(
+                              Icons.warning_amber,
+                              color: AppTheme.primary,
+                              size: 22,
+                            ),
+                            const SizedBox(width: 12),
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  const MonoLabel('Live Status'),
+                                  const SizedBox(height: 2),
+                                  Text(
+                                    _animation.value < 0.3 
+                                      ? 'Rider just picked up order' 
+                                      : _animation.value > 0.8 
+                                        ? 'Rider is arriving soon!' 
+                                        : 'Rider stopped at light (2m)',
+                                    style: GoogleFonts.spaceGrotesk(
+                                      fontSize: 14,
+                                      fontWeight: FontWeight.w700,
+                                      color: Colors.white,
+                                    ),
+                                  ),
+                                ],
                               ),
-                            ],
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                    // Back button
+                    Positioned(
+                      top: MediaQuery.of(context).padding.top + 8,
+                      left: 16,
+                      child: GestureDetector(
+                        onTap: () => Navigator.pop(context),
+                        child: Container(
+                          width: 40,
+                          height: 40,
+                          decoration: BoxDecoration(
+                            color: AppTheme.surface,
+                            borderRadius: BorderRadius.circular(4),
+                            border: Border.all(color: AppTheme.borderDark),
+                            boxShadow: const [AppTheme.hardShadow],
                           ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-                // Back button
-                Positioned(
-                  top: MediaQuery.of(context).padding.top + 8,
-                  left: 16,
-                  child: GestureDetector(
-                    onTap: () => Navigator.pop(context),
-                    child: Container(
-                      width: 40,
-                      height: 40,
-                      decoration: BoxDecoration(
-                        color: AppTheme.surface,
-                        borderRadius: BorderRadius.circular(4),
-                        border: Border.all(color: AppTheme.borderDark),
-                        boxShadow: const [AppTheme.hardShadow],
-                      ),
-                      child: const Icon(
-                        Icons.arrow_back,
-                        color: Colors.white,
-                        size: 20,
-                      ),
-                    ),
-                  ),
-                ),
-                // Help button
-                Positioned(
-                  top: MediaQuery.of(context).padding.top + 8,
-                  right: 16,
-                  child: Container(
-                    height: 40,
-                    padding: const EdgeInsets.symmetric(horizontal: 12),
-                    decoration: BoxDecoration(
-                      color: AppTheme.surface,
-                      borderRadius: BorderRadius.circular(4),
-                      border: Border.all(color: AppTheme.borderDark),
-                      boxShadow: const [AppTheme.hardShadow],
-                    ),
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Icon(
-                          Icons.support_agent,
-                          color: AppTheme.success,
-                          size: 16,
-                        ),
-                        const SizedBox(width: 6),
-                        Text(
-                          'HELP',
-                          style: GoogleFonts.spaceGrotesk(
-                            fontSize: 12,
-                            fontWeight: FontWeight.w700,
+                          child: const Icon(
+                            Icons.arrow_back,
                             color: Colors.white,
+                            size: 20,
                           ),
                         ),
-                      ],
+                      ),
                     ),
-                  ),
-                ),
-              ],
+                    // Help button
+                    Positioned(
+                      top: MediaQuery.of(context).padding.top + 8,
+                      right: 16,
+                      child: Container(
+                        height: 40,
+                        padding: const EdgeInsets.symmetric(horizontal: 12),
+                        decoration: BoxDecoration(
+                          color: AppTheme.surface,
+                          borderRadius: BorderRadius.circular(4),
+                          border: Border.all(color: AppTheme.borderDark),
+                          boxShadow: const [AppTheme.hardShadow],
+                        ),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Icon(
+                              Icons.support_agent,
+                              color: AppTheme.success,
+                              size: 16,
+                            ),
+                            const SizedBox(width: 6),
+                            Text(
+                              'HELP',
+                              style: GoogleFonts.spaceGrotesk(
+                                fontSize: 12,
+                                fontWeight: FontWeight.w700,
+                                color: Colors.white,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ],
+                );
+              },
             ),
           ),
           // Status Card (40%)
@@ -198,10 +317,10 @@ class TrackingScreen extends StatelessWidget {
                         Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            const MonoLabel('Estimated Arrival'),
+                            MonoLabel(order?.status == OrderStatus.completed ? 'Arrived at' : 'Estimated Arrival'),
                             const SizedBox(height: 4),
                             Text(
-                              '12:42 PM',
+                              order?.status == OrderStatus.completed ? 'JUST NOW' : '12:42 PM',
                               style: GoogleFonts.spaceGrotesk(
                                 fontSize: 24,
                                 fontWeight: FontWeight.w700,
@@ -216,18 +335,18 @@ class TrackingScreen extends StatelessWidget {
                             vertical: 4,
                           ),
                           decoration: BoxDecoration(
-                            color: AppTheme.success.withValues(alpha: 0.1),
+                            color: (order?.status == OrderStatus.completed ? AppTheme.success : AppTheme.primary).withValues(alpha: 0.1),
                             borderRadius: BorderRadius.circular(2),
                             border: Border.all(
-                              color: AppTheme.success.withValues(alpha: 0.3),
+                              color: (order?.status == OrderStatus.completed ? AppTheme.success : AppTheme.primary).withValues(alpha: 0.3),
                             ),
                           ),
                           child: Text(
-                            'ON TIME',
+                            (order?.status.name ?? 'ON TIME').toUpperCase().replaceAll('_', ' '),
                             style: GoogleFonts.jetBrainsMono(
                               fontSize: 10,
                               fontWeight: FontWeight.w700,
-                              color: AppTheme.success,
+                              color: order?.status == OrderStatus.completed ? AppTheme.success : AppTheme.primary,
                             ),
                           ),
                         ),
@@ -239,7 +358,7 @@ class TrackingScreen extends StatelessWidget {
                     child: ListView(
                       padding: const EdgeInsets.all(20),
                       children: [
-                        _buildTimeline(),
+                        _buildTimeline(order?.status),
                         const Divider(color: AppTheme.borderDark, height: 32),
                         _buildRiderCard(),
                       ],
@@ -254,36 +373,56 @@ class TrackingScreen extends StatelessWidget {
     );
   }
 
-  Widget _pulseDot() => Container(
-    width: 32,
-    height: 32,
-    decoration: BoxDecoration(
-      shape: BoxShape.circle,
-      color: AppTheme.primary.withValues(alpha: 0.2),
-      border: Border.all(color: AppTheme.primary),
-    ),
-    child: Center(
-      child: Container(
+  Widget _pulseDot() => Stack(
+    alignment: Alignment.center,
+    children: [
+      TweenAnimationBuilder<double>(
+        tween: Tween(begin: 0.0, end: 1.0),
+        duration: const Duration(seconds: 2),
+        builder: (context, value, child) {
+          return Container(
+            width: 32 * (1.0 + value),
+            height: 32 * (1.0 + value),
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              color: AppTheme.primary.withValues(alpha: 0.2 * (1.0 - value)),
+              border: Border.all(
+                color: AppTheme.primary.withValues(alpha: 0.5 * (1.0 - value)),
+              ),
+            ),
+          );
+        },
+      ),
+      Container(
         width: 12,
         height: 12,
         decoration: const BoxDecoration(
           shape: BoxShape.circle,
           color: AppTheme.primary,
+          boxShadow: [
+            BoxShadow(
+              color: AppTheme.primary,
+              blurRadius: 10,
+              spreadRadius: 2,
+            ),
+          ],
         ),
       ),
-    ),
+    ],
   );
 
-  Widget _buildTimeline() {
+  Widget _buildTimeline(OrderStatus? currentStatus) {
+    final statusIndex = currentStatus != null ? OrderStatus.values.indexOf(currentStatus) : 0;
+    
     final steps = [
-      {'label': 'Order Confirmed', 'time': '12:15 PM', 'status': 'done'},
-      {'label': 'Kitchen Preparing', 'time': '12:28 PM', 'status': 'done'},
+      {'label': 'Order Confirmed', 'time': '12:15 PM', 'idx': 0},
+      {'label': 'Kitchen Preparing', 'time': '12:28 PM', 'idx': 1},
       {
         'label': 'Rider Picked Up',
         'time': '12:35 PM • Heading to you',
-        'status': 'active',
+        'idx': 3, // outForDelivery
       },
-      {'label': 'Arriving', 'time': '~ 7 mins', 'status': 'pending'},
+      {'label': 'Arriving', 'time': '~ 7 mins', 'idx': 4}, // delivered
     ];
     return Container(
       padding: const EdgeInsets.only(left: 16),
@@ -292,8 +431,9 @@ class TrackingScreen extends StatelessWidget {
       ),
       child: Column(
         children: steps.map((step) {
-          final done = step['status'] == 'done';
-          final active = step['status'] == 'active';
+          final stepIdx = step['idx'] as int;
+          final done = statusIndex > stepIdx;
+          final active = statusIndex == stepIdx;
           return Padding(
             padding: const EdgeInsets.only(bottom: 20, left: 20),
             child: Stack(
@@ -325,7 +465,7 @@ class TrackingScreen extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      step['label']!,
+                      step['label'].toString(),
                       style: GoogleFonts.spaceGrotesk(
                         fontSize: 13,
                         fontWeight: FontWeight.w700,
@@ -340,7 +480,7 @@ class TrackingScreen extends StatelessWidget {
                     ),
                     const SizedBox(height: 2),
                     Text(
-                      step['time']!,
+                      step['time'].toString(),
                       style: GoogleFonts.jetBrainsMono(
                         fontSize: 11,
                         color: active
@@ -466,34 +606,60 @@ class _GridPainter extends CustomPainter {
 }
 
 class _RoutePainter extends CustomPainter {
+  final List<Offset> points;
+  final double progress;
+
+  _RoutePainter({required this.points, required this.progress});
+
   @override
   void paint(Canvas canvas, Size size) {
-    final paint = Paint()
-      ..color = AppTheme.success
-      ..strokeWidth = 4
+    if (points.isEmpty) return;
+
+    // 1. Draw Remaining (Gray/Dashed)
+    final remainingPaint = Paint()
+      ..color = AppTheme.borderDark
+      ..strokeWidth = 3
       ..style = PaintingStyle.stroke
       ..strokeCap = StrokeCap.round;
-    final dashPath = Path()
-      ..moveTo(size.width * 0.3, size.height * 0.75)
-      ..lineTo(size.width * 0.4, size.height * 0.55)
-      ..lineTo(size.width * 0.6, size.height * 0.5)
-      ..lineTo(size.width * 0.55, size.height * 0.25);
-    // Draw dashed
+
+    final fullPath = Path();
+    fullPath.moveTo(size.width * points.first.dx, size.height * points.first.dy);
+    for (var i = 1; i < points.length; i++) {
+      fullPath.lineTo(size.width * points[i].dx, size.height * points[i].dy);
+    }
+
+    // Draw full path dashed
     const dashLength = 10.0;
-    const gapLength = 5.0;
-    final metrics = dashPath.computeMetrics();
+    const gapLength = 6.0;
+    final metrics = fullPath.computeMetrics();
     for (final m in metrics) {
       double d = 0;
       while (d < m.length) {
         final end = (d + dashLength).clamp(0.0, m.length);
-        canvas.drawPath(m.extractPath(d, end), paint);
+        canvas.drawPath(m.extractPath(d, end), remainingPaint);
         d += dashLength + gapLength;
+      }
+    }
+
+    // 2. Draw Traversed (Success Color/Solid)
+    final traversedPaint = Paint()
+      ..color = AppTheme.success
+      ..strokeWidth = 4
+      ..style = PaintingStyle.stroke
+      ..strokeCap = StrokeCap.round;
+
+    for (final m in metrics) {
+      final totalLen = m.length;
+      final currentLen = totalLen * progress;
+      if (currentLen > 0) {
+        canvas.drawPath(m.extractPath(0, currentLen), traversedPaint);
       }
     }
   }
 
   @override
-  bool shouldRepaint(covariant CustomPainter old) => false;
+  bool shouldRepaint(covariant _RoutePainter oldDelegate) => 
+      oldDelegate.points != points || oldDelegate.progress != progress;
 }
 
 class _ArrowPainter extends CustomPainter {

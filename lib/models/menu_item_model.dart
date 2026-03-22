@@ -87,9 +87,47 @@ class MenuItemModel {
       rating: (data['rating'] ?? 0.0).toDouble(),
       ratingCount: data['ratingCount'] ?? 0,
       createdAt: data['createdAt'] != null
-          ? (data['createdAt'] as Timestamp).toDate()
+          ? (data['createdAt'] is Timestamp 
+              ? (data['createdAt'] as Timestamp).toDate()
+              : DateTime.parse(data['createdAt']))
           : null,
     );
+  }
+
+  factory MenuItemModel.fromMap(Map<String, dynamic> data) {
+    return MenuItemModel(
+      id: data['id'] ?? '',
+      shopId: data['shopId'] ?? '',
+      name: data['name'] ?? '',
+      price: (data['price'] ?? 0).toDouble(),
+      originalPrice: (data['originalPrice'] as num?)?.toDouble(),
+      imageUrl: data['imageUrl'] ?? data['image'],
+      isAvailable: data['isAvailable'] ?? true,
+      category: data['category'],
+      description: data['description'],
+      isVeg: data['isVeg'] ?? true,
+      rating: (data['rating'] ?? 0.0).toDouble(),
+      ratingCount: data['ratingCount'] ?? 0,
+      createdAt: data['createdAt'] != null ? DateTime.parse(data['createdAt']) : null,
+    );
+  }
+
+  Map<String, dynamic> toMap() {
+    return {
+      'id': id,
+      'shopId': shopId,
+      'name': name,
+      'price': price,
+      'originalPrice': originalPrice,
+      'imageUrl': imageUrl,
+      'isAvailable': isAvailable,
+      'category': category,
+      'description': description,
+      'isVeg': isVeg,
+      'rating': rating,
+      'ratingCount': ratingCount,
+      'createdAt': createdAt?.toIso8601String(),
+    };
   }
 
   Map<String, dynamic> toFirestore() {

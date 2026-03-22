@@ -58,6 +58,7 @@ class PrimaryButton extends StatefulWidget {
   final VoidCallback onPressed;
   final Widget? icon;
   final Widget? trailing;
+  final bool isLoading;
 
   const PrimaryButton({
     super.key,
@@ -65,6 +66,7 @@ class PrimaryButton extends StatefulWidget {
     required this.onPressed,
     this.icon,
     this.trailing,
+    this.isLoading = false,
   });
 
   @override
@@ -77,39 +79,50 @@ class _PrimaryButtonState extends State<PrimaryButton> {
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTapDown: (_) => setState(() => _isPressed = true),
+      onTapDown: (_) => widget.isLoading ? null : setState(() => _isPressed = true),
       onTapUp: (_) => setState(() => _isPressed = false),
       onTapCancel: () => setState(() => _isPressed = false),
-      onTap: widget.onPressed,
+      onTap: widget.isLoading ? null : widget.onPressed,
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 50),
-        margin: _isPressed
+        margin: _isPressed && !widget.isLoading
             ? const EdgeInsets.only(top: 4, left: 4)
             : EdgeInsets.zero,
         padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
         decoration: BoxDecoration(
-          color: AppTheme.primary,
+          color: widget.isLoading ? AppTheme.primary.withValues(alpha: 0.7) : AppTheme.primary,
           border: Border.all(color: Colors.black, width: 2),
           borderRadius: BorderRadius.circular(AppTheme.radiusSm),
-          boxShadow: _isPressed ? null : const [AppTheme.hardShadow],
+          boxShadow: _isPressed || widget.isLoading ? null : const [AppTheme.hardShadow],
         ),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            if (widget.icon != null) ...[
-              widget.icon!,
-              const SizedBox(width: 8),
-            ],
-            Text(
-              widget.label.toUpperCase(),
-              style: GoogleFonts.spaceGrotesk(
-                fontSize: 14,
-                fontWeight: FontWeight.w800,
-                color: Colors.white,
-                letterSpacing: 1,
+            if (widget.isLoading)
+              const SizedBox(
+                height: 20,
+                width: 20,
+                child: CircularProgressIndicator(
+                  strokeWidth: 2,
+                  valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                ),
+              )
+            else ...[
+              if (widget.icon != null) ...[
+                widget.icon!,
+                const SizedBox(width: 8),
+              ],
+              Text(
+                widget.label.toUpperCase(),
+                style: GoogleFonts.spaceGrotesk(
+                  fontSize: 14,
+                  fontWeight: FontWeight.w800,
+                  color: Colors.white,
+                  letterSpacing: 1,
+                ),
               ),
-            ),
-            if (widget.trailing != null) ...[const Spacer(), widget.trailing!],
+              if (widget.trailing != null) ...[const Spacer(), widget.trailing!],
+            ],
           ],
         ),
       ),

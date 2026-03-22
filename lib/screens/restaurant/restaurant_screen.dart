@@ -428,7 +428,7 @@ class _RestaurantScreenState extends State<RestaurantScreen> {
                     child: CachedNetworkImage(
                       imageUrl: item['image'] as String? ?? '',
                       fit: BoxFit.cover,
-                      errorWidget: (_, __, ___) => const Center(
+                      errorWidget: (context, url, error) => const Center(
                         child: Icon(
                           Icons.restaurant,
                           color: AppTheme.borderDark,

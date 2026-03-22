@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:provider/provider.dart';
 import '../../config/app_theme.dart';
 import '../../widgets/industrial_widgets.dart';
 import '../../models/shop_model.dart';
+import '../../models/menu_item_model.dart';
+import '../../providers/cart_provider.dart';
 
 class FoodDetailScreen extends StatefulWidget {
   final Map<String, dynamic> item;
@@ -506,6 +509,22 @@ class _FoodDetailScreenState extends State<FoodDetailScreen> {
                 ],
               ),
               onPressed: () {
+                final cart = context.read<CartProvider>();
+                
+                // Create MenuItemModel from Map
+                final menuItem = MenuItemModel.fromMap({
+                  'id': widget.item['id'] ?? widget.item['name'],
+                  'name': widget.item['name'],
+                  'price': (widget.item['price'] as num).toDouble(),
+                  'image': widget.item['image'],
+                  'shopId': widget.item['shopId'] ?? 'demo_shop',
+                });
+
+                // Add to cart with quantity
+                for (int i = 0; i < _quantity; i++) {
+                  cart.addToCart(menuItem);
+                }
+
                 widget.onAddToCart();
                 Navigator.pop(context);
               },

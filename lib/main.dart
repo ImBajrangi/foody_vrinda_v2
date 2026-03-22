@@ -1,10 +1,21 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'package:provider/provider.dart';
+import 'firebase_options.dart';
 import 'config/app_theme.dart';
+import 'providers/cart_provider.dart';
+import 'services/order_service.dart';
+import 'services/auth_service.dart';
 import 'screens/home/home_screen.dart';
 
-void main() {
+void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
+
   SystemChrome.setSystemUIOverlayStyle(
     const SystemUiOverlayStyle(
       statusBarColor: Colors.transparent,
@@ -13,7 +24,17 @@ void main() {
       systemNavigationBarIconBrightness: Brightness.light,
     ),
   );
-  runApp(const FoodyVrindaV2App());
+  
+  runApp(
+    MultiProvider(
+      providers: [
+        ChangeNotifierProvider(create: (_) => CartProvider()),
+        Provider(create: (_) => OrderService()),
+        Provider(create: (_) => AuthService()),
+      ],
+      child: const FoodyVrindaV2App(),
+    ),
+  );
 }
 
 class FoodyVrindaV2App extends StatelessWidget {

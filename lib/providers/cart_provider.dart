@@ -1,102 +1,95 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../models/cart_item_model.dart';
 import '../models/menu_item_model.dart';
 
-class CartProvider extends ChangeNotifier {
-  final List<CartItemModel> _items = [];
-  String? _shopId;
+class CartProvider with ChangeNotifier {
+  List<CartItemModel> _items = [];
+  bool _isInitialized = false;
 
-  List<CartItemModel> get items => List.unmodifiable(_items);
-  String? get shopId => _shopId;
-  bool get isEmpty => _items.isEmpty;
-  bool get isNotEmpty => _items.isNotEmpty;
+  List<CartItemModel> get items => _items;
+  bool get isInitialized => _isInitialized;
 
-  int get totalItems => _items.fold(0, (sum, item) => sum + item.quantity);
-
-  double get totalAmount => _items.fold(0.0, (sum, item) => sum + item.total);
-
-  String get formattedTotal => '₹${totalAmount.toStringAsFixed(0)}';
-
-  void setShopId(String? id) {
-    if (_shopId != id) {
-      // Clear cart when switching shops
-      _items.clear();
-      _shopId = id;
-      notifyListeners();
-    }
+  CartProvider() {
+    _loadCart();
   }
 
-  void addItem(MenuItemModel menuItem) {
-    final existingIndex = _items.indexWhere(
-      (item) => item.menuItem.id == menuItem.id,
-    );
-
-    if (existingIndex >= 0) {
-      _items[existingIndex].quantity++;
-    } else {
-      _items.add(CartItemModel(menuItem: menuItem));
-    }
-
-    notifyListeners();
-  }
-
-  void removeItem(String menuItemId) {
-    _items.removeWhere((item) => item.menuItem.id == menuItemId);
-    notifyListeners();
-  }
-
-  void incrementItem(String menuItemId) {
-    final index = _items.indexWhere((item) => item.menuItem.id == menuItemId);
-    if (index >= 0) {
-      _items[index].quantity++;
-      notifyListeners();
-    }
-  }
-
-  void decrementItem(String menuItemId) {
-    final index = _items.indexWhere((item) => item.menuItem.id == menuItemId);
-    if (index >= 0) {
-      if (_items[index].quantity > 1) {
-        _items[index].quantity--;
-      } else {
-        _items.removeAt(index);
+  // Persistent Cache Logic
+  Future<void> _loadCart() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final cartJson = prefs.getString('cached_cart');
+      if (cartJson != null) {
+        final List<dynamic> decoded = jsonDecode(cartJson);
+        _items = decoded.map((item) {
+          // This assumes MenuItemModel has a fromMap/toJson
+          // We'll need to ensure MenuItemModel is robust
+          return CartItemModel(
+            menuItem: MenuItemModel.fromMap(item['menuItem']),
+            quantity: item['quantity'],
+          );
+        }).toList();
       }
+    } catch (e) {
+      debugPrint('CartProvider: Error loading cart: $e');
+    } finally {
+      _isInitialized = true;
       notifyListeners();
     }
   }
 
-  void updateQuantity(String menuItemId, int quantity) {
-    if (quantity <= 0) {
-      removeItem(menuItemId);
-      return;
+  Future<void> _saveCart() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final cartJson = jsonEncode(_items.map((item) => {
+        'menuItem': item.menuItem.toMap(),
+        'quantity': item.quantity,
+      }).toList());
+      await prefs.setString('cached_cart', cartJson);
+    } catch (e) {
+      debugPrint('CartProvider: Error saving cart: $e');
     }
+  }
 
-    final index = _items.indexWhere((item) => item.menuItem.id == menuItemId);
-    if (index >= 0) {
-      _items[index].quantity = quantity;
+  void addToCart(MenuItemModel item) {
+    final index = _items.indexWhere((cartItem) => cartItem.menuItem.id == item.id);
+    if (index != -1) {
+      _items[index].quantity++;
+    } else {
+      _items.add(CartItemModel(menuItem: item));
+    }
+    _saveCart();
+    notifyListeners();
+  }
+
+  void removeFromCart(String itemId) {
+    _items.removeWhere((item) => item.menuItem.id == itemId);
+    _saveCart();
+    notifyListeners();
+  }
+
+  void updateQuantity(String itemId, int quantity) {
+    final index = _items.indexWhere((item) => item.menuItem.id == itemId);
+    if (index != -1) {
+      if (quantity <= 0) {
+        _items.removeAt(index);
+      } else {
+        _items[index].quantity = quantity;
+      }
+      _saveCart();
       notifyListeners();
     }
-  }
-
-  int getItemQuantity(String menuItemId) {
-    final item = _items
-        .where((item) => item.menuItem.id == menuItemId)
-        .firstOrNull;
-    return item?.quantity ?? 0;
-  }
-
-  bool hasItem(String menuItemId) {
-    return _items.any((item) => item.menuItem.id == menuItemId);
   }
 
   void clear() {
     _items.clear();
+    _saveCart();
     notifyListeners();
   }
 
-  void clearAndSetShop(String? shopId) {
-    _items.clear();
-    _shopId = shopId;
-    notifyListeners();
-  }
+  double get subtotal => _items.fold(0, (sum, item) => sum + item.total);
+  double get deliveryFee => _items.isEmpty ? 0 : 25.0; // Flat fee for demo
+  double get tax => subtotal * 0.05; // 5% GST
+  double get total => subtotal + deliveryFee + tax;
 }
