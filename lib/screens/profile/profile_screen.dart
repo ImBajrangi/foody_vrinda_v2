@@ -47,7 +47,8 @@ class ProfileScreen extends StatelessWidget {
                     ),
                     const SizedBox(height: 12),
                     Text(
-                      'MR. BAJRANGI',
+                      authProvider.userData?.displayName?.toUpperCase() ?? 
+                      (authProvider.user?.isAnonymous == true ? 'GUEST_OPERATOR' : 'UNAUTHENTICATED'),
                       style: GoogleFonts.spaceGrotesk(
                         fontSize: 20,
                         fontWeight: FontWeight.w900,
@@ -55,7 +56,11 @@ class ProfileScreen extends StatelessWidget {
                         letterSpacing: 1,
                       ),
                     ),
-                    const MonoLabel('BAJRANGI_DEV // MODE_ACTIVE'),
+                    MonoLabel(
+                      authProvider.isAuthenticated 
+                        ? (authProvider.user?.isAnonymous == true ? 'GUEST_MODE // RESTRICTED' : '${authProvider.userData?.email?.toUpperCase()} // ACCESS_GRANTED')
+                        : 'OFFLINE // AUTH_REQUIRED'
+                    ),
                   ],
                 ),
               ),
@@ -96,9 +101,8 @@ class ProfileScreen extends StatelessWidget {
                 _profileOption(Icons.settings, 'SYSTEM_CONFIG', () {}),
                 const SizedBox(height: 32),
                 PrimaryButton(
-                  label: 'DISCONNECT_SESSION',
-                  onPressed: () =>
-                      Navigator.of(context).popUntil((route) => route.isFirst),
+                  label: authProvider.user?.isAnonymous == true ? 'INITIALIZE_AUTH_SESSION' : 'DISCONNECT_SESSION',
+                  onPressed: () => authProvider.signOut(),
                 ),
                 const SizedBox(height: 100),
               ]),

@@ -10,6 +10,7 @@ import 'services/auth_service.dart';
 import 'services/shop_service.dart';
 import 'providers/auth_provider.dart';
 import 'screens/home/home_screen.dart';
+import 'screens/auth/login_screen.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -50,7 +51,32 @@ class FoodyVrindaV2App extends StatelessWidget {
       title: 'Foody Vrinda',
       debugShowCheckedModeBanner: false,
       theme: AppTheme.darkTheme,
-      home: const HomeScreen(),
+      home: const AuthWrapper(),
     );
+  }
+}
+
+class AuthWrapper extends StatelessWidget {
+  const AuthWrapper({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    final auth = context.watch<AuthProvider>();
+
+    switch (auth.status) {
+      case AuthStatus.authenticated:
+        return const HomeScreen();
+      case AuthStatus.unauthenticated:
+        return const LoginScreen();
+      case AuthStatus.loading:
+      case AuthStatus.uninitialized:
+      default:
+        return const Scaffold(
+          backgroundColor: AppTheme.background,
+          body: Center(
+            child: CircularProgressIndicator(color: AppTheme.primary),
+          ),
+        );
+    }
   }
 }

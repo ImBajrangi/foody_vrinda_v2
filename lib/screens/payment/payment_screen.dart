@@ -122,10 +122,23 @@ class _PaymentScreenState extends State<PaymentScreen> {
       final orderService = context.read<OrderService>();
       final auth = context.read<AuthProvider>();
       
-      final String? userId = auth.user?.uid;
+      final String? authUserId = auth.user?.uid;
+      String? userId = authUserId;
+      
+      if (userId == null) {
+        debugPrint('PaymentScreen: User not authenticated. Attempting anonymous sign-in for order creation...');
+        await auth.signInAnonymously();
+        // Wait a small bit for provider to update if necessary, though it should be immediate
+        userId = auth.user?.uid;
+        debugPrint('PaymentScreen: Anonymous sign-in complete. UID: $userId');
+      }
+
+      if (userId == null) {
+        throw Exception('COULD NOT AUTHENTICATE GUEST USER');
+      }
       
       final orderId = await orderService.createOrder(
-        userId: userId ?? 'guest_user',
+        userId: userId,
         shopId: cart.shopId ?? 'main_kitchen',
         customerName: widget.customerName,
         customerPhone: widget.customerPhone,
@@ -264,9 +277,19 @@ class _PaymentScreenState extends State<PaymentScreen> {
         margin: const EdgeInsets.only(bottom: 12),
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
-          color: selected ? AppTheme.primary.withValues(alpha: 0.1) : AppTheme.surface,
-          border: Border.all(color: selected ? AppTheme.primary : AppTheme.borderDark, width: 2),
-          boxShadow: selected ? [AppTheme.redGlowShadow] : [AppTheme.hardShadow],
+          color: selected ? AppTheme.primary.withValues(alpha: 0.15) : AppTheme.surface,
+          border: Border.all(
+            color: selected ? AppTheme.primary : AppTheme.borderDark, 
+            width: selected ? 2 : 1
+          ),
+          boxShadow: selected ? [
+            BoxShadow(
+              color: AppTheme.primary.withValues(alpha: 0.3),
+              blurRadius: 10,
+              spreadRadius: 0,
+            ),
+            AppTheme.hardShadow
+          ] : [AppTheme.hardShadow],
         ),
         child: Row(
           children: [
