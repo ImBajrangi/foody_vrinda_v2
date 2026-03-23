@@ -1,3 +1,5 @@
+rootProject.name = "foody_vrinda_v2"
+
 pluginManagement {
     val flutterSdkPath =
         run {
